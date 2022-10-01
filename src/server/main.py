@@ -3,10 +3,9 @@
 import socket
 import ssl
 
-certfile = "../certs/server/avacado-server.c2.pem"
-keyfile = "../certs/server/avacado-server.c2-key.pem"
+certfile = "../certs/server/avocado-server.c2.pem"
+keyfile = "../certs/server/avocado-server.c2-key.pem"
 client_cert = "../certs/client/rootCA.pem"
-hostname = "avacado-server.c2"
 
 # mTLS settings
 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)

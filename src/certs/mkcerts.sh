@@ -7,9 +7,9 @@ mkdir client
 mkdir server
 
 cd $CURR/server
-CAROOT=$PWD/server mkcert 'avacado-server.c2'
+CAROOT=$PWD mkcert 'avocado-server.c2'
 
 cd $CURR/client
-CAROOT=$PWD/client mkcert -client 'avacado-implant.c2'
+CAROOT=$PWD mkcert -client 'avocado-implant.c2'
 
 cd $CURR
