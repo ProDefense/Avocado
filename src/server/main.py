@@ -1,33 +1,26 @@
 #!/usr/bin/env python3
+# TODO: Convert CLI to CMD2
+import mtls
 
-import socket
-import ssl
 
-certfile = "../certs/server/avocado-server.c2.pem"
-keyfile = "../certs/server/avocado-server.c2-key.pem"
-client_cert = "../certs/client/rootCA.pem"
+def main():
+    listener = mtls.Listener()
+    while True:
+        userin = input("> ")
+        userin = userin.split()
 
-# mTLS settings
-ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-ctx.verify_mode = ssl.CERT_REQUIRED
-ctx.load_cert_chain(certfile, keyfile)
-ctx.load_verify_locations(cafile=client_cert)
-ctx.post_handshake_auth = True
+        # Print sessions
+        if len(userin) < 1:
+            continue
+        elif userin[0] == "sessions":
+            for id in listener.sessions.list():
+                print(id)
+        elif userin[0] == "use":
+            if len(userin) == 2:
+                conn, addr = listener.sessions.get(userin[1])
+                print(f"Using session with {addr}")
+                mtls.session(conn)
 
-# Create a TCP socket
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind(("127.0.0.1", 31337))
-    s.listen()
-    # Use TLS over the socket
-    with ctx.wrap_socket(s, server_side=True) as ssock:
-        conn, addr = ssock.accept()
-        conn.verify_client_post_handshake()
-        # Send data to implant
-        while True:
-            userin = input("> ")
-            conn.sendall(userin.encode("utf-8"))
-            data = conn.recv(1024)
-            if not data:
-                break
-            else:
-                print(data.decode("utf-8"))
+
+if __name__ == "__main__":
+    main()
