@@ -49,7 +49,7 @@ class Listener:
         ctx.verify_mode = ssl.CERT_REQUIRED
         ctx.load_cert_chain(certfile, keyfile)
         ctx.load_verify_locations(cafile=client_cert)
-        ctx.post_handshake_auth = True
+        # ctx.post_handshake_auth = True
 
         # Create a secure socket wrapped in mTLS
         ssock = self.mkssock(ctx)
@@ -68,7 +68,7 @@ class Listener:
     def accept(self, ssock: ssl.SSLSocket):
         while True:
             conn, addr = ssock.accept()
-            conn.verify_client_post_handshake()
+            # conn.verify_client_post_handshake()
             id = self.sessions.add(conn, addr)
             # TODO: remove this print statement, send this to the log
             print(f"Accepted connection from {addr} | {id}")
