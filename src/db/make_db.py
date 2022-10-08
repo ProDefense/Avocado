@@ -20,7 +20,7 @@ c2Cursor =  c2db.cursor()
 # If the tables do not exist, create the tables w/ their columns 
 # NOTE: removed AUTO INCREMENT (refer to https://www.sqlite.org/autoinc.html)
 implantRecords = """CREATE TABLE IF NOT EXISTS Implants (
-                    [Implant_UUID] INTEGER AUTO_INCREMENT PRIMARY KEY, 
+                    [Implant_UUID] STRING PRIMARY KEY, 
                     [OS] TEXT,
                     [Arch.] TEXT,
                     [IPv4] TEXT,
@@ -32,7 +32,7 @@ implantRecords = """CREATE TABLE IF NOT EXISTS Implants (
                                                 # section 2.2, 3.1.1, 3.4)   
 
 lootRecords = """ CREATE TABLE IF NOT EXISTS Loot (
-                  [Loot_UUID] INT PRIMARY KEY,
+                  [Loot_UUID] STRING PRIMARY KEY,
                   [Loot_Type] TEXT,
                   [Implant_UUID] TEXT,
                   [CreatedAt] NUMERIC)"""           
