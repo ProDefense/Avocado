@@ -8,14 +8,14 @@ c2db = sqlite3.connect(
 # getting the cursor by cursor() method
 c2Cursor =  c2db.cursor()
 
-# creating database
+# creating database - remote version - not applicable in sprint1
 # c2Cursor.execute("CREATE DATABASE C2Database")
 
 # establish the entities w/ their characteristics 
 # TODO: fix queries for sqlite3
 # RESOLVED: fixed the queries, removed AUTO INCREMENT (refer to https://www.sqlite.org/autoinc.html)
 implantRecords = """CREATE TABLE IF NOT EXISTS Implants (
-                    [Implant_UUID] INTEGER AUTO_INCREMENT PRIMARY KEY, 
+                    [Implant_UUID] INTEGER PRIMARY KEY, 
                     [OS] TEXT,
                     [Arch.] TEXT,
                     [IPv4] TEXT,
