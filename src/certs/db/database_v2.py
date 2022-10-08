@@ -15,7 +15,7 @@ c2Cursor =  c2db.cursor()
 # TODO: fix queries for sqlite3
 # RESOLVED: fixed the queries, removed AUTO INCREMENT (refer to https://www.sqlite.org/autoinc.html)
 implantRecords = """CREATE TABLE IF NOT EXISTS Implants (
-                    [Implant_UUID] INTEGER PRIMARY KEY, 
+                    [Implant_UUID] STRING PRIMARY KEY, 
                     [OS] TEXT,
                     [Arch.] TEXT,
                     [IPv4] TEXT,
@@ -25,7 +25,7 @@ implantRecords = """CREATE TABLE IF NOT EXISTS Implants (
                     [ImplantUpTime] NUMERIC)""" #Numeric data type allows for access to the date and time functions(refer to https://www.sqlite.org/datatype3.html section 2.2, 3.1.1, 3.4)   
 
 lootRecords = """ CREATE TABLE Loot (
-                  [Loot_UUID] INT PRIMARY KEY,
+                  [Loot_UUID] STRING PRIMARY KEY,
                   [Loot_Type] TEXT,
                   [Implant_UUID] TEXT,
                   [CreatedAt] NUMERIC)"""           
