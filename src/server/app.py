@@ -11,7 +11,7 @@ class Window(QWidget):
 
 app = QApplication(sys.argv)
 app.setApplicationName("Avocado")
-path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), './assets/avocadologo.png')
+path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), 'assets/avocadologo.png')
 app.setWindowIcon(QIcon(path))
 window = Window()
 window.show()
