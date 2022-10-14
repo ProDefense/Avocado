@@ -22,3 +22,16 @@ $ ./main.py
 $ cd Avocado/src/implant
 $ ./main.py
 ```
+
+
+## Packages
+
+Install the requirements with
+```angular2html
+pip install requirements.txt
+```
+
+Add the packages that you've added to the requirements text.
+```angular2html
+pip freeze > requirements.txt
+```
