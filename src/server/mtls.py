@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import socket
 import ssl
 import threading
@@ -70,8 +71,11 @@ class Listener:
             conn, addr = ssock.accept()
             # conn.verify_client_post_handshake()
             id = self.sessions.add(conn, addr)
+            
+            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+            logging.info(f"Accepted connection from {addr} | {id}")
             # TODO: remove this print statement, send this to the log
-            print(f"Accepted connection from {addr} | {id}")
+            #print(f"Accepted connection from {addr} | {id}")
 
 
 # Send data to implant
@@ -86,4 +90,6 @@ def session(conn: ssl.SSLContext):
         if not data:
             break
         else:
+            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+            logging.info(data.decode("utf-8"))
             print(data.decode("utf-8"))
