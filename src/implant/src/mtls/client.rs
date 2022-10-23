@@ -3,9 +3,11 @@ use std::net::TcpStream;
 use std::sync::Arc;
 use std::io::{Read, Write};
 use anyhow::{Result, Ok};
+use prost::Message;
 use rustls::{ClientConfig, ClientConnection, Stream};
 
 use super::Server;
+use crate::tasks::registration::register;
 
 pub struct Client {
     conn: ClientConnection,
@@ -19,10 +21,13 @@ impl Client {
         let sock = TcpStream::connect(server.addr)?;
 
         // TODO: Register with the server
-        Ok(Client { 
+        let mut client = Client {
             conn,
             sock
-        })
+        };
+
+        client.write(register()?.encode_to_vec())?;
+        Ok(client)
     }
 
     /// Read 1024 bytes from the tls stream

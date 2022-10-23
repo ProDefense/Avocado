@@ -1,6 +1,7 @@
 // Examples taken from https://github.com/rustls/rustls
 mod mtls;
 mod tasks;
+mod pb;
 
 fn main() {
     // TODO: embed the client certs at compile time
