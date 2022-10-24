@@ -10,6 +10,11 @@
     <height>572</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Academy Engraved LET</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Avocado 🥑</string>
   </property>
@@ -24,6 +29,86 @@ background-color:#1F1F28
 background-color:#16161D
 }</string>
    </property>
+   <widget class="QTableWidget" name="implants">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>50</y>
+      <width>561</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string>external</string>
+     </property>
+     <property name="foreground">
+      <brush brushstyle="Dense1Pattern">
+       <color alpha="255">
+        <red>168</red>
+        <green>212</green>
+        <blue>237</blue>
+       </color>
+      </brush>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>internal</string>
+     </property>
+     <property name="foreground">
+      <brush brushstyle="Dense2Pattern">
+       <color alpha="255">
+        <red>168</red>
+        <green>212</green>
+        <blue>237</blue>
+       </color>
+      </brush>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>machine name</string>
+     </property>
+     <property name="foreground">
+      <brush brushstyle="Dense1Pattern">
+       <color alpha="255">
+        <red>167</red>
+        <green>212</green>
+        <blue>236</blue>
+       </color>
+      </brush>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>user</string>
+     </property>
+     <property name="foreground">
+      <brush brushstyle="Dense1Pattern">
+       <color alpha="255">
+        <red>167</red>
+        <green>212</green>
+        <blue>236</blue>
+       </color>
+      </brush>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>last</string>
+     </property>
+     <property name="foreground">
+      <brush brushstyle="Dense1Pattern">
+       <color alpha="255">
+        <red>179</red>
+        <green>218</green>
+        <blue>239</blue>
+       </color>
+      </brush>
+     </property>
+    </column>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

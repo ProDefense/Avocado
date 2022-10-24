@@ -26,12 +26,13 @@ $ ./main.py
 
 ## Packages
 
-Install the requirements with
+The server relies on Python 3.10. 
+Install the requirements.
 ```angular2html
-pip install requirements.txt
+$ pip install requirements.txt
 ```
 
 Add the packages that you've added to the requirements text.
 ```angular2html
-pip freeze > requirements.txt
+$ pip freeze > requirements.txt
 ```
