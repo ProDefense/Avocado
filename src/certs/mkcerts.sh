@@ -14,6 +14,6 @@ cd $CURR/client
 CAROOT=$PWD mkcert -client 'avocado-implant.c2'
 
 cd $CURR/operator
-CAROOT=$PWD mkcert -client 'avocado-operater.c2'
+CAROOT=$PWD mkcert -client 'avocado-operator.c2'
 
 cd $CURR

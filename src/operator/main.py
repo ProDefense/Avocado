@@ -6,8 +6,8 @@ import os
 
 hostname = "avocado-server.c2"
 server_cert = "../certs/server/rootCA.pem"
-operator_cert = "../certs/operator/avocado-operater.c2-client.pem"
-operator_key = "../certs/operator/avocado-operater.c2-client-key.pem"
+operator_cert = "../certs/operator/avocado-operator.c2-client.pem"
+operator_key = "../certs/operator/avocado-operator.c2-client-key.pem"
 
 
 # mTLS 
