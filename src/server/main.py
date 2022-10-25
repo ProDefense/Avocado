@@ -2,6 +2,7 @@
 # TODO: Convert CLI to CMD2
 import mtls
 import logging
+import socket
 
 def main():
     listener = mtls.Listener()
