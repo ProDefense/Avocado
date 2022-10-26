@@ -19,9 +19,7 @@
    <string>Avocado 🥑</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QMainWindow{
-background-color:#1F1F28
-}</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -29,85 +27,21 @@ background-color:#1F1F28
 background-color:#16161D
 }</string>
    </property>
-   <widget class="QTableWidget" name="implants">
+   <widget class="QTableView" name="implants">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>50</y>
-      <width>561</width>
-      <height>192</height>
+      <x>20</x>
+      <y>20</y>
+      <width>491</width>
+      <height>171</height>
      </rect>
     </property>
-    <column>
-     <property name="text">
-      <string>external</string>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="Dense1Pattern">
-       <color alpha="255">
-        <red>168</red>
-        <green>212</green>
-        <blue>237</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>internal</string>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="Dense2Pattern">
-       <color alpha="255">
-        <red>168</red>
-        <green>212</green>
-        <blue>237</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>machine name</string>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="Dense1Pattern">
-       <color alpha="255">
-        <red>167</red>
-        <green>212</green>
-        <blue>236</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>user</string>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="Dense1Pattern">
-       <color alpha="255">
-        <red>167</red>
-        <green>212</green>
-        <blue>236</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>last</string>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="Dense1Pattern">
-       <color alpha="255">
-        <red>179</red>
-        <green>218</green>
-        <blue>239</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>1</horstretch>
+      <verstretch>1</verstretch>
+     </sizepolicy>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
