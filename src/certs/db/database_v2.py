@@ -17,7 +17,7 @@ c2Cursor =  c2db.cursor()
 implantRecords = """CREATE TABLE IF NOT EXISTS Implants (
                     [Implant_UUID] STRING PRIMARY KEY, 
                     [OS] TEXT,
-                    [Arch.] TEXT,
+                    [Arch] TEXT,
                     [IPv4] TEXT,
                     [Hostname] TEXT,
                     [Username] TEXT, 
@@ -28,7 +28,14 @@ lootRecords = """ CREATE TABLE Loot (
                   [Loot_UUID] STRING PRIMARY KEY,
                   [Loot_Type] TEXT,
                   [Implant_UUID] TEXT,
-                  [CreatedAt] NUMERIC)"""           
+                  [CreatedAt] NUMERIC)"""
+
+operators = """ CREATE TABLE Operators (
+                  [User] STRING PRIMARY KEY,
+                  [Password] STRING,
+                  [Public_Key] STRING)""" # not decided if we are going with password or public key based 
+
+
 
 #create tables in db
 c2Cursor.execute(implantRecords)
