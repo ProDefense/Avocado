@@ -75,7 +75,7 @@ class Listener:
 
             # Send the registration to the handler
             data = conn.recv(1024)
-            requestq.put(data)
+            requestq.put((data, addr))
 
             # Add the session
             id = self.sessions.add(conn, addr)

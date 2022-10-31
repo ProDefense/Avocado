@@ -4,7 +4,7 @@ package implantpb;
 
 // Basic info about an implant
 message Registration {
-  string ip = 1;
+  string addr = 1;
   string os = 2;
   uint32 pid = 3;
   User user = 4; // The user running the implant

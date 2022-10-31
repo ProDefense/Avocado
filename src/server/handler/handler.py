@@ -16,17 +16,19 @@ class Handler:
     def __handle(self):
         # Get items from the queue
         while True:
-            data = self.__requestq.get()
+            data, addr = self.__requestq.get()
 
             implant = implantpb_pb2.Registration()
             implant.ParseFromString(data)
+            if len(implant.addr) < 1:
+                implant.addr = str(addr)
 
             # TODO: Add the `implant` to the database
 
             # TODO: Log this part here instead of printing to stdout
             display = f"""
             Accepted new connection:
-                ip: {implant.ip},
+                addr: {implant.addr},
                 os: {implant.os},
                 pid: {implant.pid},
                 user: {implant.user.name},
