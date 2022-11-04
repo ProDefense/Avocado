@@ -1,5 +1,6 @@
 // Examples taken from https://github.com/rustls/rustls
 mod mtls;
+mod pb;
 mod tasks;
 
 fn main() {

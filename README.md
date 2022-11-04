@@ -22,3 +22,17 @@ $ ./main.py
 $ cd Avocado/src/implant
 $ ./main.py
 ```
+
+
+## Packages
+
+The server relies on Python 3.10. 
+Install the requirements.
+```angular2html
+$ pip install requirements.txt
+```
+
+Add the packages that you've added to the requirements text.
+```angular2html
+$ pip freeze > requirements.txt
+```

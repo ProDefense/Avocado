@@ -1,0 +1,18 @@
+// Create protobuf messages for communication between the server and implant
+syntax = "proto3";
+package implantpb;
+
+// Basic info about an implant
+message Registration {
+  string addr = 1;
+  string os = 2;
+  uint32 pid = 3;
+  User user = 4; // The user running the implant
+  repeated User groups = 5; // The groups this user is a part of
+}
+
+// A user/group on a linux machine
+message User {
+  uint32 id = 1;
+  string name = 2;
+}
