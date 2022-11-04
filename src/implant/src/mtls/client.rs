@@ -1,28 +1,30 @@
 // use std::{net::TcpStream, sync::Arc, io::{Write, Read}};
+use anyhow::{Ok, Result};
+use prost::Message;
+use rustls::{ClientConfig, ClientConnection, Stream};
+use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::sync::Arc;
-use std::io::{Read, Write};
-use anyhow::{Result, Ok};
-use rustls::{ClientConfig, ClientConnection, Stream};
 
 use super::Server;
+use crate::tasks::registration::register;
 
 pub struct Client {
     conn: ClientConnection,
-    sock: TcpStream
+    sock: TcpStream,
 }
 
 impl Client {
-    pub fn new(config: ClientConfig, server :Server) -> Result<Client> {
+    pub fn new(config: ClientConfig, server: Server) -> Result<Client> {
         // Connect to the server
         let conn = ClientConnection::new(Arc::new(config), server.name)?;
         let sock = TcpStream::connect(server.addr)?;
 
         // TODO: Register with the server
-        Ok(Client { 
-            conn,
-            sock
-        })
+        let mut client = Client { conn, sock };
+
+        client.write(register()?.encode_to_vec())?;
+        Ok(client)
     }
 
     /// Read 1024 bytes from the tls stream
@@ -31,8 +33,7 @@ impl Client {
         let mut tls = Stream::new(&mut self.conn, &mut self.sock);
         let mut buffer = [0; 1024];
         tls.read(&mut buffer[..]).unwrap();
-        let s = std::str::from_utf8(&buffer)?
-            .to_string();
+        let s = std::str::from_utf8(&buffer)?.to_string();
         Ok(s)
     }
 

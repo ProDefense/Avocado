@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
 # TODO: Convert CLI to CMD2
-import mtls
+import logging
+from mtls import mtls
+from queue import Queue
+from handler.handler import Handler
 
 
 def main():
-    listener = mtls.Listener()
+    requestq = Queue()
+    handler = Handler(requestq)
+    handler.start()
+    listener = mtls.Listener(requestq)
+
     while True:
         userin = input("> ")
         userin = userin.split()
+
+        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+        commandStr = ' '.join(userin)
+        logging.info("Command: " + commandStr)
 
         # Print sessions
         if len(userin) < 1:
