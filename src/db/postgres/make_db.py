@@ -1,38 +1,76 @@
 import psycopg2
 import os
-import subprocess
+import sqlalchemy
+import sqlalchemy.orm
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 # Establish connection
 conn = psycopg2.connect(
     database = "postgres", user='postgres', password='password', host='127.0.0.1', port='5432'
 )
 conn.autocommit = True
-
-# Create cursor object using cursor() method
 cursor = conn.cursor()
 
-# Create tablespace folder with correct ownership 
-
-# mkdir ./data
+# Create tablespace folder with correct ownership - run as bash script
+# TODO: run # mkdir ./data
 # chown postgres:postgres ./data
-# Query to create that tablespace in server
-tablespace_path = os.getcwd() + "/data"
-os.mkdir(tablespace_path)
-os.chown(tablespace_path, uid = 10, gid = -1) # change ownership of "./data" to postgres user (uid = 10)
-print("created tablespace path at: {tablespace_path}")
 
-cursor.execute('''CREATE TABLESPACE db_tablespace
-                  OWNER postgres
-                  LOCATION %s''',
-            (tablespace_path))
+# Create tablespace in server
+tablespace_path = os.getcwd() + '/data'
+SQL = '''CREATE TABLESPACE db_tablespace
+         OWNER postgres
+         LOCATION %s'''
+data = (tablespace_path, )
+try:
+    cursor.execute(SQL, data)
+except Exception as error:
+    print ("An exception occured: ", error)
 
-# Query to create database
-query = '''CREATE DATABASE test_db
-           TABLESPACE db_tablespace''';
-cursor.execute(query)
 
-# Query to initialize tables
+# Create database
+try: 
+    cursor.execute('''CREATE DATABASE test_db
+                  TABLESPACE db_tablespace''')
+except Exception as error:
+    print ("An exception occured: ", error)
 
+
+# Connect to SQLAlchemy engine
+engine = sqlalchemy.create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
+
+# Declare database models
+Base = sqlalchemy.orm.declarative_base()
+class implantRecords(Base):
+    __tablename__ = "Implants"
+
+    Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    OS = sqlalchemy.Column(sqlalchemy.String(64))
+    Arch = sqlalchemy.Column(sqlalchemy.String(64))
+    IPv4 = sqlalchemy.Column(sqlalchemy.String(64))
+    Hostname = sqlalchemy.Column(sqlalchemy.String(64))
+    Username = sqlalchemy.Column(sqlalchemy.String(64))
+    PID = sqlalchemy.Column(sqlalchemy.Integer)
+    ImplantUpTime = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
+
+class lootRecords(Base):
+    __tablename__ = "Loot"
+
+    Loot_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    Loot_Type = sqlalchemy.Column(sqlalchemy.String(64))
+    Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
+    Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
+    CreatedAt = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
+
+class operatorRecords(Base):
+    __tablename__ = "Operators"
+
+    Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    User = sqlalchemy.Column(sqlalchemy.String(64))
+    Password = sqlalchemy.Column(sqlalchemy.String(64))
+
+Base.metadata.create_all(engine)
+print("Tables created")
 
 # Close connection
 conn.close()
