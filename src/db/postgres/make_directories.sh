@@ -1,3 +1,3 @@
-#1/bin/bash
+#!/bin/sh
 mkdir ./data
-chown postgres:postgres ./data
+sudo chown postgres:postgres ./data

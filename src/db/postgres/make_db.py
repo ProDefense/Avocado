@@ -1,5 +1,6 @@
 import psycopg2
 import os
+import subprocess
 import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy.dialects.postgresql import UUID
@@ -12,9 +13,9 @@ conn = psycopg2.connect(
 conn.autocommit = True
 cursor = conn.cursor()
 
-# Create tablespace folder with correct ownership - run as bash script
-# TODO: run # mkdir ./data
-# chown postgres:postgres ./data
+# Run make_directories.sh to create tablespace folder with correct ownership
+os.chmod('./make_directories.sh', 0o755)
+proces = subprocess.call("./make_directories.sh")
 
 # Create tablespace in server
 tablespace_path = os.getcwd() + '/data'
@@ -69,6 +70,7 @@ class operatorRecords(Base):
     User = sqlalchemy.Column(sqlalchemy.String(64))
     Password = sqlalchemy.Column(sqlalchemy.String(64))
 
+# create tables
 Base.metadata.create_all(engine)
 print("Tables created")
 
