@@ -6,6 +6,11 @@ import sqlalchemy.orm
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
+#allow for user input if they have postgres setup on their personal device
+username = input("Please enter your postgres username, if no user associated please enter 'postgres' for username: ")
+print(username)
+user_password = input("Please enter your postgres password, if no user associated please enter 'password' for password: ")
+
 # Establish connection
 conn = psycopg2.connect(
     database = "postgres", user='postgres', password='password', host='127.0.0.1', port='5432'
