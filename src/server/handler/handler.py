@@ -2,35 +2,51 @@
 import threading
 from queue import Queue
 from pb import implantpb_pb2
-
+from sqlalchemy import create_engine, engine, insert
 
 class Handler:
     def __init__(self, requestq: Queue):
-        self.__requestq = requestq
+        self._requestq = requestq
 
     def start(self):
-        t = threading.Thread(target=self.__handle, args=())
+        t = threading.Thread(target=self._handle_registrations, args=())
         t.start()
 
+        # Connect to SQLAlchemy engine
+        engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
+
     # Handle incoming registrations
-    def __handle(self):
+    def _handle_registrations(self):
         # Get items from the queue
         while True:
-            data, addr = self.__requestq.get()
+            data, addr = self._requestq.get()
+            self.readRegistration(data, addr)
 
-            implant = implantpb_pb2.Registration()
-            implant.ParseFromString(data)
-            if len(implant.addr) < 1:
-                implant.addr = str(addr)
+    def readRegistration(self, data: bytes, addr):
+        # Parse the incoming data
+        message = implantpb_pb2.Message()
+        message.ParseFromString(data)
+        if message.message_type == implantpb_pb2.Message.MessageType.Registration:
+            registration = implantpb_pb2.Registration()
+            registration.ParseFromString(message.data)
+            if len(registration.addr) < 1:
+                registration.addr = str(addr)
 
-            # TODO: Add the `implant` to the database
+            # TODO: Test adding implant to the database. May need to import database classes if this method does not work
+            stmt = insert(Implants).values(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", 
+                                           Username = registration.user.name, PID = registration.pid)
+            with engine.connect() as conn:
+                result = conn.execute(stmt)
+                conn.commit()
 
+            
+i
             # TODO: Log this part here instead of printing to stdout
             display = f"""
             Accepted new connection:
-                addr: {implant.addr},
-                os: {implant.os},
-                pid: {implant.pid},
-                user: {implant.user.name},
-                groups: {implant.groups}"""
+                addr: {registration.addr},
+                os: {registration.os},
+                pid: {registration.pid},
+                user: {registration.user.name},
+                groups: {registration.groups}"""
             print(display)

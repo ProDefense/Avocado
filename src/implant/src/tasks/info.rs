@@ -1,5 +1,5 @@
 // Get info about the target machine
-use crate::pb::User;
+use crate::pb::registration::User;
 use anyhow::{Context, Result};
 use sysinfo::{PidExt, SystemExt};
 

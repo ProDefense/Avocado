@@ -1,3 +1,5 @@
-pub mod exec;
+mod exec;
 mod info;
-pub mod registration;
+mod tasks;
+
+pub use tasks::*;

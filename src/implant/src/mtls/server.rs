@@ -1,14 +1,15 @@
 use std::convert::TryFrom;
 
 use anyhow::Result;
+use std::net::SocketAddr;
 
 pub struct Server {
-    pub addr: String,
+    pub addr: SocketAddr,
     pub name: rustls::ServerName,
 }
 
 impl Server {
-    pub fn new(addr: String, hostname: &str) -> Result<Server> {
+    pub fn new(addr: SocketAddr, hostname: &str) -> Result<Server> {
         Ok(Server {
             addr,
             name: rustls::ServerName::try_from(hostname)?,
