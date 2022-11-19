@@ -6,31 +6,37 @@ from pb import implantpb_pb2
 
 class Handler:
     def __init__(self, requestq: Queue):
-        self.__requestq = requestq
+        self._requestq = requestq
 
     def start(self):
-        t = threading.Thread(target=self.__handle, args=())
+        t = threading.Thread(target=self._handle_registrations, args=())
         t.start()
 
     # Handle incoming registrations
-    def __handle(self):
+    def _handle_registrations(self):
         # Get items from the queue
         while True:
-            data, addr = self.__requestq.get()
+            data, addr = self._requestq.get()
+            self.readRegistration(data, addr)
 
-            implant = implantpb_pb2.Registration()
-            implant.ParseFromString(data)
-            if len(implant.addr) < 1:
-                implant.addr = str(addr)
+    def readRegistration(self, data: bytes, addr):
+        # Parse the incoming data
+        message = implantpb_pb2.Message()
+        message.ParseFromString(data)
+        if message.message_type == implantpb_pb2.Message.MessageType.Registration:
+            registration = implantpb_pb2.Registration()
+            registration.ParseFromString(message.data)
+            if len(registration.addr) < 1:
+                registration.addr = str(addr)
 
-            # TODO: Add the `implant` to the database
+            # TODO: Add the `registration` to the database
 
             # TODO: Log this part here instead of printing to stdout
             display = f"""
             Accepted new connection:
-                addr: {implant.addr},
-                os: {implant.os},
-                pid: {implant.pid},
-                user: {implant.user.name},
-                groups: {implant.groups}"""
+                addr: {registration.addr},
+                os: {registration.os},
+                pid: {registration.pid},
+                user: {registration.user.name},
+                groups: {registration.groups}"""
             print(display)

