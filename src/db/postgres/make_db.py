@@ -13,7 +13,7 @@ user_password = input("Please enter your postgres password, if no user associate
 
 # Establish connection
 conn = psycopg2.connect(
-    database = "postgres", user='postgres', password='password', host='127.0.0.1', port='5432'
+    database = "postgres", user=username, password=user_password, host='127.0.0.1', port='5432'
 )
 conn.autocommit = True
 cursor = conn.cursor()
