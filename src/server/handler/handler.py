@@ -38,7 +38,7 @@ class Handler:
             # with engine.connect() as conn:
             #     result = conn.execute(stmt)
             #     conn.commit()
-                
+
             # TODO: Log this part here instead of printing to stdout
             display = f"""
             Accepted new connection:
