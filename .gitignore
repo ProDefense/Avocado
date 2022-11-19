@@ -130,3 +130,6 @@ dmypy.json
 
 # C2 Logger
 **/'Command Log'.txt
+
+# .pem cert files
+/src/certs/server/*.pem
