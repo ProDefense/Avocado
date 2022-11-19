@@ -32,15 +32,10 @@ class Handler:
             if len(registration.addr) < 1:
                 registration.addr = str(addr)
 
-            # TODO: Test adding implant to the database. May need to import database classes if this method does not work
-            stmt = insert(Implants).values(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", 
-                                           Username = registration.user.name, PID = registration.pid)
-            with engine.connect() as conn:
-                result = conn.execute(stmt)
-                conn.commit()
+            # TODO: Add the `registration` to the database
 
             
-i
+
             # TODO: Log this part here instead of printing to stdout
             display = f"""
             Accepted new connection:
