@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# C2 Logger
+**/'Command Log'.txt
+
+# .pem cert files
+/src/certs/server/*.pem

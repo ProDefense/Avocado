@@ -32,9 +32,12 @@ class Handler:
             if len(registration.addr) < 1:
                 registration.addr = str(addr)
 
-            # TODO: Add the `registration` to the database
-
-            
+            # TODO: Insert implants to database ... below script needs to be edited to define Implant class from ORM
+            # stmt = insert(Implants).values(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", 
+            #                                Username = registration.user.name, PID = registration.pid)
+            # with engine.connect() as conn:
+            #     result = conn.execute(stmt)
+            #     conn.commit()
 
             # TODO: Log this part here instead of printing to stdout
             display = f"""
