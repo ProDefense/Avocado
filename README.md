@@ -1,38 +1,29 @@
-# Avocado Dev Branch :avocado:
+# Avocado :avocado:
 
-Pre-stable development branch dedicated towards working on items before they are released towards the main branch.
+Avocado is currently in development. Expect bugs
 
-## Usage
+## Running Avocado for development
 
-### Running the test code
-1. First, generate CA certs for mTLS (TODO: automatically do this in python)
+1. Build and run docker container
 ```
-$ cd Avocado/src/certs/
-$ ./mkcerts.sh
-```
-
-2. Run the server
-```
-$ cd Avocado/src/server
-$ ./main.py
+$ docker build . -t avocado
+$ docker run --rm --name avocado -it avocado
 ```
 
-3. Run the implant
+2. Inside the container, generate mTLS certs (these certs are ONLY to be used in development)
 ```
-$ cd Avocado/src/implant
-$ ./main.py
-```
-
-
-## Packages
-
-The server relies on Python 3.10. 
-Install the requirements.
-```angular2html
-$ pip install -r requirements.txt
+avocado$ cd src/certs
+avocado$ ./mkcerts.sh
 ```
 
-Add the packages that you've added to the requirements text.
-```angular2html
-$ pip freeze > requirements.txt
+3. Inside the container, run the server
+```
+avocado$ cd src/server
+avocado$ ./main.py
+```
+
+4. Inside the container, compile and run the implant.
+```
+avocado$ cd src/implant
+avocado$ cargo run
 ```
