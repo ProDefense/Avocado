@@ -2,7 +2,7 @@
 import threading
 from queue import Queue
 from pb import implantpb_pb2
-
+from sqlalchemy import create_engine, engine, insert
 
 class Handler:
     def __init__(self, requestq: Queue):
@@ -11,6 +11,9 @@ class Handler:
     def start(self):
         t = threading.Thread(target=self._handle_registrations, args=())
         t.start()
+
+        # Connect to SQLAlchemy engine
+        engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
 
     # Handle incoming registrations
     def _handle_registrations(self):
@@ -29,7 +32,12 @@ class Handler:
             if len(registration.addr) < 1:
                 registration.addr = str(addr)
 
-            # TODO: Add the `registration` to the database
+            # TODO: Insert implants to database ... below script needs to be edited to define Implant class from ORM
+            # stmt = insert(Implants).values(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", 
+            #                                Username = registration.user.name, PID = registration.pid)
+            # with engine.connect() as conn:
+            #     result = conn.execute(stmt)
+            #     conn.commit()
 
             # TODO: Log this part here instead of printing to stdout
             display = f"""
