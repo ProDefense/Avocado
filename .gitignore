@@ -133,3 +133,5 @@ dmypy.json
 
 # .pem cert files
 /src/certs/server/*.pem
+/src/certs/client/*.pem
+
