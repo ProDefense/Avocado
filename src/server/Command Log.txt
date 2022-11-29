@@ -1,0 +1,92 @@
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: .generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: sessions
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: sessions
+INFO:root:Command: generate
+INFO:root:Command: 
+INFO:root:Command: sessions
+INFO:root:Command: generate
+INFO:root:Accepted connection from ('127.0.0.1', 56502) | 3d07d83e-256a-41ef-acbe-efcde2862536
+INFO:root:Command: 
+INFO:root:Command: sessions
+INFO:root:Command: use 3d07d83e-256a-41ef-acbe-efcde2862536
+INFO:root:b'certs\nCommand Log.txt\ngenerate\nhandler\nimplant\nmain.py\nmtls\npb\nREADME.md\nutil\n'
+INFO:root:b'sadeli\n'
+INFO:root:b'Linux mooncell 6.0.10-arch2-1 #1 SMP PREEMPT_DYNAMIC Sat, 26 Nov 2022 16:51:18 +0000 x86_64 GNU/Linux\n'
+INFO:root:Command: generate
+INFO:root:Command: generate
+INFO:root:Accepted connection from ('127.0.0.1', 37190) | a274acea-a1a1-4e0d-b4ef-cf039528d944
+INFO:root:Command: 
+INFO:root:Command: generate
+INFO:root:Accepted connection from ('127.0.0.1', 49056) | 05ada2ae-cea9-4693-9904-b10f1b71d3dd
+INFO:root:Command: 
+INFO:root:Command: sessions
+INFO:root:Command: use 05ada2ae-cea9-4693-9904-b10f1b71d3dd
+INFO:root:b'certs\nCommand Log.txt\ngenerate\nhandler\nimplant\nmain.py\nmtls\npb\nREADME.md\nutil\n'
+INFO:root:b'sadeli\n'
+INFO:root:Accepted connection from ('127.0.0.1', 60824) | 9aa30d1a-a13c-4afc-a5fb-c337199be7e7
+INFO:root:b''
+INFO:root:b'sadeli\n'
+INFO:root:Command: sessions
+INFO:root:Command: use 9aa30d1a-a13c-4afc-a5fb-c337199be7e7
+INFO:root:b'certs\nCommand Log.txt\ngenerate\nhandler\nimplant\nmain.py\nmtls\npb\nREADME.md\nutil\n'
