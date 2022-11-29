@@ -1,6 +1,6 @@
+use crate::pb::{os_cmd_output::Status, OsCmd, OsCmdOutput, Registration};
 /// Execute a task and return a protbuf Message
 use anyhow::Result;
-use crate::pb::{OsCmd, OsCmdOutput, Registration, os_cmd_output::Status};
 
 pub fn register() -> Result<Registration> {
     let info = super::info::Info::new();
@@ -17,9 +17,8 @@ pub fn exec(os_cmd: OsCmd) -> Result<OsCmdOutput> {
     let output = super::exec::exec(&os_cmd.cmd)?;
     Ok(OsCmdOutput {
         // status: output.status.code(),
-        status: output.status.code()
-            .map(|i| Status::Code(i)),
+        status: output.status.code().map(|i| Status::Code(i)),
         stderr: output.stderr,
-        stdout: output.stdout
+        stdout: output.stdout,
     })
 }

