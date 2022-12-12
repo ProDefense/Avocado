@@ -41,20 +41,20 @@ class RemoteMachinesModel(QAbstractTableModel):
         return QtCore.QVariant(int(section + 1))
 
 
-remoteMachineStyleSheet = """
-QWidget {
-    background-color: #24273A;
-    color: "white";
-}
-QPushButton {
-    font-size: 16px;
-    background-color: "darkblue"
-}
-QLineEdit {
-    background-color: "white";
-    color: "black";
-}
-"""
+# remoteMachineStyleSheet = """
+# QWidget {
+#     background-color: #24273A;
+#     color: "white";
+# }
+# QPushButton {
+#     font-size: 16px;
+#     background-color: "darkblue"
+# }
+# QLineEdit {
+#     background-color: "white";
+#     color: "black";
+# }
+# """
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -73,11 +73,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self._remoteMachinesModel = RemoteMachinesModel(data, header)
         self.implants.setModel(self._remoteMachinesModel)
-
-        self.implants.setStyleSheet(remoteMachineStyleSheet)
+        self.remoteMachinesStyleSheet = self.loadStyleSheet()
+        self.implants.setStyleSheet(self.remoteMachinesStyleSheet)
         self.implants.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.implants.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.implants.resizeColumnsToContents()
+
+    def loadStyleSheet(self):
+        remoteMachinesStyleSheet = open("stylesheets/remoteMachineStyleSheet.css", "r")
+        return remoteMachinesStyleSheet.read()
 
 
 app = QApplication(sys.argv)
