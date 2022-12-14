@@ -42,7 +42,7 @@ class RemoteMachinesModel(QAbstractTableModel):
             return QtCore.QVariant(self.headers[section])
         return QtCore.QVariant(int(section + 1))
 
-#
+
 class RemoteMachines(QWidget, Ui_RemoteMachines):
 
     def __init__(self):
@@ -56,7 +56,6 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
 
         ]
         header = ["external", "internal", "user", "name", "pid", "last"]
-
         self._remoteMachinesModel = RemoteMachinesModel(data, header)
         self.implants.setModel(self._remoteMachinesModel)
         self.remoteMachinesStyleSheet = self.loadStyleSheet()
@@ -64,11 +63,11 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
         self.implants.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.implants.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.implants.resizeColumnsToContents()
+        self.implants.verticalHeader().setVisible(False)
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("stylesheets/remoteMachineStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
-
 
 
 # Main app that connects widgets into one window
@@ -77,15 +76,23 @@ class MainApp(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
-        self.layout = QVBoxLayout()
+
+        layout = QVBoxLayout()
         # add active session and remote machines table to one widget
-        self.layout.addWidget(RemoteMachines())
-        self.layout.addWidget(ActiveSession())
+        layout.addWidget(RemoteMachines())
+        layout.addWidget(ActiveSession())
         # widget holds layout
         widget = QWidget()
-        widget.setLayout(self.layout)
+        widget.setLayout(layout)
+        # stylesheet
+        self.mainAppStyleSheet = self.loadStyleSheet()
+        self.setStyleSheet(self.mainAppStyleSheet)
+
         self.setCentralWidget(widget)
 
+    def loadStyleSheet(self):
+        remoteMachinesStyleSheet = open("stylesheets/mainWindowStyleSheet.css", "r")
+        return remoteMachinesStyleSheet.read()
 
 
 app = QApplication(sys.argv)

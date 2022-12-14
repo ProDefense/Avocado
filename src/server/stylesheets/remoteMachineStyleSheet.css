@@ -6,8 +6,12 @@ QPushButton {
     font-size: 16px;
     background-color: "darkblue"
 }
-QLineEdit {
-    background-color: "white";
-    color: "black";
+QHeaderView {
+    background-color: #26294F;
 }
+
+/*QLineEdit {*/
+/*    background-color: "white";*/
+/*    color: "black";*/
+/*}*/
 
