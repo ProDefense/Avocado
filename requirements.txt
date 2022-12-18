@@ -1,4 +1,7 @@
+protobuf==4.21.9
+psycopg2-binary==2.9.5
 PyQt6==6.4.0
 PyQt6-Qt6==6.4.0
 PyQt6-sip==13.4.0
-protobuf==4.21.9
+shiboken6==6.4.0
+SQLAlchemy==1.4.45
