@@ -1,5 +1,5 @@
 Install the following dependencies, in the Build prerequisites section, for using psycopg2: https://www.psycopg.org/docs/install.html#install-from-source
-Install SQLAlchgemy: https://docs.sqlalchemy.org/en/14/intro.html#installation
+Install SQLAlchemy: https://docs.sqlalchemy.org/en/14/intro.html#installation
 
 To create database, run "python3 make_db.py"
 

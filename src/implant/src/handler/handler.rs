@@ -1,13 +1,13 @@
 //! Handle protbuf messages
 
-use prost::Message;
-use crate::pb::{self, message::MessageType, error::ErrorType};
+use crate::pb::{self, error::ErrorType, message::MessageType};
 use crate::tasks;
+use prost::Message;
 use std::sync::mpsc;
 
 enum Status {
     Unregistered,
-    Registered(String)
+    Registered(String),
 }
 
 /// Receive messages and send results
@@ -17,7 +17,7 @@ pub struct Handler {
     /// Receive messages from the server
     rx: mpsc::Receiver<pb::Message>,
     /// Send messages to the server
-    tx: mpsc::Sender<pb::Message>
+    tx: mpsc::Sender<pb::Message>,
 }
 
 impl Handler {
@@ -25,7 +25,7 @@ impl Handler {
         Handler {
             status: Status::Unregistered,
             rx,
-            tx
+            tx,
         }
     }
 
@@ -52,7 +52,7 @@ impl Handler {
     fn register(&self) -> pb::Message {
         pb::Message {
             message_type: pb::message::MessageType::Registration.into(),
-            data: tasks::register().unwrap().encode_to_vec()
+            data: tasks::register().unwrap().encode_to_vec(),
         }
     }
 
@@ -69,39 +69,35 @@ impl Handler {
     fn handle_message_authed(&self, message: pb::Message) -> pb::Message {
         let buf = message.data.as_slice();
         let (message_type, data) = match message.message_type() {
-            MessageType::OsCmd => {
-                match self.handle_cmd(buf) {
-                    Ok(output) => (MessageType::OsCmdOutput.into(), output.encode_to_vec()),
-                    Err(e) => (MessageType::Error.into(), e.encode_to_vec())
-                }
-            }
-            _ => (MessageType::Error.into(), pb::Error {
+            MessageType::OsCmd => match self.handle_cmd(buf) {
+                Ok(output) => (MessageType::OsCmdOutput.into(), output.encode_to_vec()),
+                Err(e) => (MessageType::Error.into(), e.encode_to_vec()),
+            },
+            _ => (
+                MessageType::Error.into(),
+                pb::Error {
                     error_type: ErrorType::MessageDecode.into(),
-                    message: String::from("unimplemented")
-                }.encode_to_vec()
-            )
+                    message: String::from("unimplemented"),
+                }
+                .encode_to_vec(),
+            ),
         };
 
-        pb::Message {
-            message_type,
-            data
-        }
+        pb::Message { message_type, data }
     }
 
     // Run an OS command
     fn handle_cmd(&self, buf: &[u8]) -> Result<pb::OsCmdOutput, pb::Error> {
         // Decode the message
-        let os_cmd = pb::OsCmd::decode(buf)
-            .map_err(|e| pb::Error {
-                error_type: ErrorType::MessageDecode.into(),
-                message: e.to_string()
-            })?;
+        let os_cmd = pb::OsCmd::decode(buf).map_err(|e| pb::Error {
+            error_type: ErrorType::MessageDecode.into(),
+            message: e.to_string(),
+        })?;
 
         // Execute the command
-        tasks::exec(os_cmd)
-            .map_err(|e| pb::Error {
-                error_type: ErrorType::OsCmd.into(),
-                message: e.to_string()
-            })
+        tasks::exec(os_cmd).map_err(|e| pb::Error {
+            error_type: ErrorType::OsCmd.into(),
+            message: e.to_string(),
+        })
     }
 }
