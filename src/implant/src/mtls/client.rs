@@ -1,12 +1,12 @@
+use super::Server;
 use crate::pb;
 use anyhow::Result;
+use mio::{net::TcpStream, Interest, Token};
 use prost::Message;
 use rustls::{ClientConfig, ClientConnection};
 use std::io::{Read, Write};
+use std::sync::{mpsc, Arc};
 use std::time::Duration;
-use mio::{net::TcpStream, Token, Interest};
-use std::sync::{Arc, mpsc};
-use super::Server;
 
 // 0.5 MiB buffer
 const BUFFER_SIZE: usize = 524288;
@@ -27,7 +27,7 @@ impl Client {
         // Connect to the server
         Ok(Client {
             conn: ClientConnection::new(Arc::new(config), server.name)?,
-            sock: TcpStream::connect(server.addr)?
+            sock: TcpStream::connect(server.addr)?,
         })
     }
 
@@ -37,7 +37,12 @@ impl Client {
         let mut events = mio::Events::with_capacity(EVENTS_SIZE);
         let mut poll = mio::Poll::new().unwrap();
         poll.registry()
-            .register(&mut self.sock, CLIENT, Interest::READABLE | Interest::WRITABLE).unwrap();
+            .register(
+                &mut self.sock,
+                CLIENT,
+                Interest::READABLE | Interest::WRITABLE,
+            )
+            .unwrap();
 
         // Mio event loop
         loop {
@@ -55,7 +60,7 @@ impl Client {
                         }
 
                         if io_state.peer_has_closed() {
-                            return
+                            return;
                         }
                     }
 
@@ -68,7 +73,13 @@ impl Client {
                     }
                 }
 
-                poll.registry().reregister(&mut self.sock, CLIENT, Interest::READABLE | Interest::WRITABLE).unwrap();
+                poll.registry()
+                    .reregister(
+                        &mut self.sock,
+                        CLIENT,
+                        Interest::READABLE | Interest::WRITABLE,
+                    )
+                    .unwrap();
             }
         }
     }

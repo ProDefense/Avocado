@@ -1,0 +1,17 @@
+QWidget {
+    background-color: #24273A;
+    color: "white";
+}
+QPushButton {
+    font-size: 16px;
+    background-color: "darkblue"
+}
+QHeaderView {
+    background-color: #26294F;
+}
+
+/*QLineEdit {*/
+/*    background-color: "white";*/
+/*    color: "black";*/
+/*}*/
+
