@@ -8,9 +8,9 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBox
 import sys
 from PyQt6.QtGui import QIcon
 
-from src.server.active_session_logic import ActiveSession
-from src.server.main_window import Ui_MainWindow
-from src.server.remote_machines import Ui_RemoteMachines
+from active_session_logic import ActiveSession
+from main_window import Ui_MainWindow
+from remote_machines import Ui_RemoteMachines
 
 DisplayRole = Qt.ItemDataRole.DisplayRole
 Horizontal = Qt.Orientation.Horizontal
