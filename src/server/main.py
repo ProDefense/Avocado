@@ -38,8 +38,16 @@ def main():
                 print("Usage: use <session>")
         # Compile an implant
         elif userin[0] == "generate":
+            if len(userin) != 2:
+                print("Usage: generate linux|windows")
+                continue
+
+            if userin[1] != "linux" and userin[1] != "windows":
+                print("Usage: generate linux|windows")
+                continue
+
             print("Generating the implant...")
-            generate(listener.client_certs)
+            generate(listener.client_certs, userin[1])
 
 
 if __name__ == "__main__":

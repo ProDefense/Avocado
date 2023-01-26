@@ -13,6 +13,7 @@ class Profile:
             implant_certs: Certs,
             out_dir: str,
             assets_dir: str,
+            target_os: str,
             server_name: str = "server",
             server_rootca: str = "rootCA.pem"):
         self.server_endpoint = server_endpoint  # Server url
@@ -20,6 +21,7 @@ class Profile:
         self.server_rootca = server_rootca  # Name of the server rootca cert
         self.implant_certs = implant_certs  # Implant certificats
         self.assets_dir = assets_dir  # Embed files into the implant
+        self.target_os = target_os  # Either "linux" or "windows"
         self.out_dir = out_dir  # Which directory to output the implant binary
 
     # Run cargo build.
@@ -32,8 +34,14 @@ class Profile:
 
     def _cargo_build(self, cargo_toml_path: str) -> int:
         path = os.environ["PATH"]
+        args = ["/usr/bin/cargo", "build", "-Z", "unstable-options", "--manifest-path", cargo_toml_path, "--out-dir", self.out_dir, "--release"]
+        if self.target_os == "linux":
+            args.append("--target=x86_64-unknown-linux-musl")
+        elif self.target_os == "windows":
+            args.append("--target=x86_64-pc-windows-gnu")
+
         exit_code = subprocess.Popen(
-            ["/usr/bin/cargo", "build", "-Z", "unstable-options", "--manifest-path", cargo_toml_path, "--out-dir", self.out_dir, "--release"],
+            args,
             env={
                 "PATH": path,
                 "SERVER_ENDPOINT": self.server_endpoint,
@@ -50,7 +58,7 @@ class Profile:
 
 
 # A wrapper for the generate command
-def generate(implant_certs: Certs) -> Profile:
+def generate(implant_certs: Certs, target_os: str) -> Profile:
     # Create a directory to store implant assets
     assets_dir = os.path.join(AVOCADO_ROOT, "implant_assets")
     try:
@@ -71,7 +79,8 @@ def generate(implant_certs: Certs) -> Profile:
         server_endpoint="127.0.0.1:31337",
         implant_certs=implant_certs,
         out_dir=".",
-        assets_dir=assets_dir
+        assets_dir=assets_dir,
+        target_os=target_os
     )
     profile.generate()
     return profile
