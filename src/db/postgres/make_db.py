@@ -5,14 +5,6 @@ import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-#FIRST CHANGE - Added new imports from docs.sqlalchemy.org
-from sqlalchemy.orm import DeclarativeBase
-from typing import List
-from typing import Optional
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
-
 
 #allow for user input if they have postgres setup on their personal device
 username = input("Please enter your postgres username, if no user associated please enter 'postgres' for username: ")
@@ -54,39 +46,34 @@ except Exception as error:
 engine = sqlalchemy.create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
 
 # Declare database models
-#SECOND CHANGE - RJ: Establishing a declarative base with class Base
-#Base = sqlalchemy.orm.declarative_base()
-class Base(DeclarativeBase):
-	pass
-Base.metadata
-
-#THIRD CHANGE - RJ: Declaring mapped classes with the appropriate ORM format.
+Base = sqlalchemy.orm.declarative_base()
 class implantRecords(Base):
     __tablename__ = "Implants"
-    #Implant_UUID: mapped_column(primary_key=True)
-    OS: Mapped[str] = mapped_column(String(64))
-    Arch: Mapped[str] =  mappeed_column(String(64))
-    IPv4: Mapped[str] = mapped_column(String(64))
-    Hostname: Mapped[str] = mapped_column(String(64))
-    Username: Mapped[str] = mapped_column(String(64))
-    PID: Mapped[int] = mapped_column
-    #ImplantUpTime = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
+
+    Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    OS = sqlalchemy.Column(sqlalchemy.String(64))
+    Arch = sqlalchemy.Column(sqlalchemy.String(64))
+    IPv4 = sqlalchemy.Column(sqlalchemy.String(64))
+    Hostname = sqlalchemy.Column(sqlalchemy.String(64))
+    Username = sqlalchemy.Column(sqlalchemy.String(64))
+    PID = sqlalchemy.Column(sqlalchemy.Integer)
+    ImplantUpTime = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
 
 class lootRecords(Base):
     __tablename__ = "Loot"
 
-    #Loot_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    Loot_Type: Mapped[str] = mapped_column(String(64))
-    #Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
-    #Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
-    #CreatedAt = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
+    Loot_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    Loot_Type = sqlalchemy.Column(sqlalchemy.String(64))
+    Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
+    Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
+    CreatedAt = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
 
 class operatorRecords(Base):
     __tablename__ = "Operators"
 
-    #Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    User: Mapped[str] = mapped_column(String(64))
-    Password: Mapped[str] = mapped_column(String(64))
+    Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    User = sqlalchemy.Column(sqlalchemy.String(64))
+    Password = sqlalchemy.Column(sqlalchemy.String(64))
 
 # create tables
 Base.metadata.create_all(engine)
