@@ -9,7 +9,7 @@ def main():
     s.connect((host,port))
     msg = ""
     while True:
-        msg = input(">")
+        msg = input("$")
         s.send(msg.encode('ascii'))
         data = s.recv(1024)
         if msg.lower() == "exit":
