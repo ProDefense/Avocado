@@ -1,19 +1,40 @@
 import sys
+import socket
 
 from PyQt6.QtWidgets import QApplication, QWidget
 from active_session import Ui_Active_Session
 
 
 class ActiveSession(QWidget, Ui_Active_Session):
-    def __init__(self, parent=None):
+    def __init__(self, s, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.terminalInput.returnPressed.connect(self.inputHandler)
         self.activeSessionStyleSheet = self.loadStyleSheet()
         self.setStyleSheet(self.activeSessionStyleSheet)
+        self.s = s
+
+
+    def guiPrint(self, text):
+        self.terminalOutput.appendPlainText(text)
 
     def inputHandler(self):
-        self.terminalOutput.appendPlainText("Hello World")
+        msg = self.terminalInput.text()
+        self.terminalInput.clear()
+
+        self.s.send(msg.encode('ascii'))
+        data = self.s.recv(1024)
+
+        if msg.lower() == "exit":
+            self.guiPrint("[+]Connection Terminated")
+            self.s.close() 
+            exit()
+
+        elif (not data):
+            self.guiPrint("no data")
+        else:
+            self.guiPrint("[+]Recv: " + str(data.decode('ascii')))
+
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("stylesheets/activeSessionStyleSheet.css", "r")

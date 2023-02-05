@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import os
+import socket
+import sys
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget
-import sys
 from PyQt6.QtGui import QIcon
 
 from active_session_logic import ActiveSession
@@ -73,6 +74,12 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
+        # set up client connection
+        host = "127.0.0.1"
+        port = 12345
+        s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        s.connect((host,port))
+
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
@@ -80,7 +87,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         layout = QVBoxLayout()
         # add active session and remote machines table to one widget
         layout.addWidget(RemoteMachines())
-        layout.addWidget(ActiveSession())
+        layout.addWidget(ActiveSession(s))
         # widget holds layout
         widget = QWidget()
         widget.setLayout(layout)
