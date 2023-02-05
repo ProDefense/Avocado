@@ -46,7 +46,7 @@ class C2Server(object):
             if len(command) == 2:
                 conn, addr = self.implantlistener.sessions.get(command[1]) 
                 print(f"Using session with {addr}")
-                mtls.session(conn) #this will hijack the the server essentially
+                mtls.session(conn) #this will hijack the server essentially
             else:
                 print("Usage: use <session>")
         # Compile an implant
