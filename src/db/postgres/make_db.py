@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 #FIRST CHANGE - Added new imports from docs.sqlalchemy.org
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import cast, select, String
+from sqlalchemy import cast, select, String, TIMESTAMP
 from typing import List
 from typing import Optional
 from sqlalchemy.orm import Mapped
@@ -71,8 +71,7 @@ class implantRecords(Base):
     Hostname: Mapped[str] = mapped_column(String(64))
     Username: Mapped[str] = mapped_column(String(64))
     PID: Mapped[int] = mapped_column
-    #ImplantUpTime = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
-
+    ImplantUpTime: Mapped[ImplantUpTime.datetime] = TIMESTAMP(timezone = True)
 class lootRecords(Base):
     __tablename__ = "Loot"
 
@@ -80,7 +79,7 @@ class lootRecords(Base):
     Loot_Type: Mapped[str] = mapped_column(String(64))
     #Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
     #Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
-    #CreatedAt = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
+    CreatedAt: Mapped[CreatedAt.datetime] = TIMESTAMP(timezone = True)
 
 class operatorRecords(Base):
     __tablename__ = "Operators"
