@@ -4,6 +4,7 @@ import subprocess
 #import sqlalchemy
 #import sqlalchemy.orm
 import uuid
+import datetime
 #FIRST CHANGE - Added new imports from docs.sqlalchemy.org
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey
@@ -59,7 +60,7 @@ engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/t
 # Declare database models
 #SECOND CHANGE - RJ: Establishing a declarative base with class Base
 class Base(DeclarativeBase):
-	pass
+    pass
 Base.metadata
 
 #THIRD CHANGE - RJ: Declaring mapped classes with the appropriate ORM format.
@@ -73,14 +74,14 @@ class implantRecords(Base):
     Hostname: Mapped[str] = mapped_column(String(64))
     Username: Mapped[str] = mapped_column(String(64))
     PID: Mapped[int] = mapped_column
-    ImplantUpTime: Mapped[ImplantUpTime.datetime] = TIMESTAMP(timezone = True)
+    ImplantUpTime: Mapped[datetime.datetime] = TIMESTAMP(timezone = True)
 class lootRecords(Base):
     __tablename__ = "Loot"
     Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     Loot_Type: Mapped[str] = mapped_column(String(64))
     Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
     Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
-    CreatedAt: Mapped[CreatedAt.datetime] = TIMESTAMP(timezone = True)
+    CreatedAt: Mapped[datetime.datetime] = TIMESTAMP(timezone = True)
 
 class operatorRecords(Base):
     __tablename__ = "Operators"
