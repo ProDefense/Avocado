@@ -65,7 +65,7 @@ Base.metadata
 #THIRD CHANGE - RJ: Declaring mapped classes with the appropriate ORM format.
 class implantRecords(Base):
     __tablename__ = "Implants"
-    Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid64)
+    Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     OS: Mapped[str] = mapped_column(String(64))
     Arch: Mapped[str] =  mapped_column(String(64))
     Arch: Mapped[str] =  mapped_column(String(64))
@@ -76,7 +76,7 @@ class implantRecords(Base):
     ImplantUpTime: Mapped[ImplantUpTime.datetime] = TIMESTAMP(timezone = True)
 class lootRecords(Base):
     __tablename__ = "Loot"
-    Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid64)
+    Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     Loot_Type: Mapped[str] = mapped_column(String(64))
     Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
     Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
