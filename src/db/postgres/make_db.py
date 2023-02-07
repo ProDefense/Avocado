@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 #FIRST CHANGE - Added new imports from docs.sqlalchemy.org
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import cast, select, String
 from typing import List
 from typing import Optional
 from sqlalchemy.orm import Mapped
@@ -65,7 +66,7 @@ class implantRecords(Base):
     __tablename__ = "Implants"
     #Implant_UUID: mapped_column(primary_key=True)
     OS: Mapped[str] = mapped_column(String(64))
-    Arch: Mapped[str] =  mappeed_column(String(64))
+    Arch: Mapped[str] =  mapped_column(String(64))
     IPv4: Mapped[str] = mapped_column(String(64))
     Hostname: Mapped[str] = mapped_column(String(64))
     Username: Mapped[str] = mapped_column(String(64))
