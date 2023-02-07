@@ -32,7 +32,7 @@ os.chmod('./make_directories.sh', 0o755)
 proces = subprocess.call("./make_directories.sh")
 
 # Create tablespace in server
-tablespace_path = os.getcwd() + '/data'
+tablespace_path = os.getcwd() + '/postgres/data'
 SQL = '''CREATE TABLESPACE db_tablespace
          OWNER postgres
          LOCATION %s'''
