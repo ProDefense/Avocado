@@ -8,7 +8,7 @@ import uuid
 from sqlalchemy import create_engine
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import cast, select, String
+from sqlalchemy import cast, select, String, TIMESTAMP
 from typing import List
 from typing import Optional
 from sqlalchemy.orm import Mapped
@@ -68,12 +68,12 @@ class implantRecords(Base):
     Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid64)
     OS: Mapped[str] = mapped_column(String(64))
     Arch: Mapped[str] =  mapped_column(String(64))
+    Arch: Mapped[str] =  mapped_column(String(64))
     IPv4: Mapped[str] = mapped_column(String(64))
     Hostname: Mapped[str] = mapped_column(String(64))
     Username: Mapped[str] = mapped_column(String(64))
-    PID: Mapped[int]
-    #ImplantUpTime = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
-
+    PID: Mapped[int] = mapped_column
+    ImplantUpTime: Mapped[ImplantUpTime.datetime] = TIMESTAMP(timezone = True)
 class lootRecords(Base):
     __tablename__ = "Loot"
     Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid64)
@@ -81,6 +81,9 @@ class lootRecords(Base):
     Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
     Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
     #CreatedAt = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
+    #Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
+    #Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
+    CreatedAt: Mapped[CreatedAt.datetime] = TIMESTAMP(timezone = True)
 
 class operatorRecords(Base):
     __tablename__ = "Operators"
