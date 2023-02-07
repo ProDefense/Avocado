@@ -6,6 +6,7 @@ import subprocess
 import uuid
 #FIRST CHANGE - Added new imports from docs.sqlalchemy.org
 from sqlalchemy import create_engine
+from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import cast, select, String, TIMESTAMP
@@ -57,7 +58,6 @@ engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/t
 
 # Declare database models
 #SECOND CHANGE - RJ: Establishing a declarative base with class Base
-#Base = sqlalchemy.orm.declarative_base()
 class Base(DeclarativeBase):
 	pass
 Base.metadata
@@ -78,11 +78,8 @@ class lootRecords(Base):
     __tablename__ = "Loot"
     Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid64)
     Loot_Type: Mapped[str] = mapped_column(String(64))
-    Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
-    Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
-    #CreatedAt = sqlalchemy.Column(sqlalchemy.DateTime, default=sqlalchemy.func.now())
-    #Implant_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
-    #Operator_UUID = sqlalchemy.Column(UUID(as_uuid=True), sqlalchemy.ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
+    Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
+    Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
     CreatedAt: Mapped[CreatedAt.datetime] = TIMESTAMP(timezone = True)
 
 class operatorRecords(Base):
