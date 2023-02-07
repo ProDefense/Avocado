@@ -1,11 +1,8 @@
 import psycopg2
 import os
 import subprocess
-#import sqlalchemy
-#import sqlalchemy.orm
 import uuid
 import datetime
-#FIRST CHANGE - Added new imports from docs.sqlalchemy.org
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
@@ -57,13 +54,12 @@ except Exception as error:
 # Connect to SQLAlchemy engine
 engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
 
-# Declare database models
-#SECOND CHANGE - RJ: Establishing a declarative base with class Base
+# Declare database models using SQLAlchemy ORM
 class Base(DeclarativeBase):
     pass
 Base.metadata
 
-#THIRD CHANGE - RJ: Declaring mapped classes with the appropriate ORM format.
+# Declaring mapped classes with the appropriate ORM format.
 class implantRecords(Base):
     __tablename__ = "Implants"
     Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -75,6 +71,7 @@ class implantRecords(Base):
     Username: Mapped[str] = mapped_column(String(64))
     PID: Mapped[int] = mapped_column
     ImplantUpTime: Mapped[datetime.datetime] = TIMESTAMP(timezone = True)
+    
 class lootRecords(Base):
     __tablename__ = "Loot"
     Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
