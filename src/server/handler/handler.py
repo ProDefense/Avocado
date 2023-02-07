@@ -4,6 +4,12 @@ from queue import Queue
 from pb import implantpb_pb2
 from sqlalchemy import create_engine, engine, insert
 
+# TODO: Import db objects, add src/db/postgres to the system path and test
+#import sys
+#import os
+#db_module_path = os.getcwd() + '../../db'
+#sys.path.insert(0, db_module_path)
+
 class Handler:
     def __init__(self, requestq: Queue):
         self._requestq = requestq
