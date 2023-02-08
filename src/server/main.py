@@ -4,6 +4,12 @@ import logging
 from mtls import mtls
 from generate.generate import generate
 from queue import Queue
+
+# TODO: maybe remove
+# import os
+# import sys
+# db_module_path = os.getcwd() + '../../db'
+# sys.path.insert(0, db_module_path)
 from handler.handler import Handler
 
 

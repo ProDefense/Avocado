@@ -1,18 +1,10 @@
 import psycopg2
 import os
 import subprocess
-import uuid
-import datetime
 from sqlalchemy import create_engine
-from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import cast, select, String, TIMESTAMP
 from typing import List
 from typing import Optional
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from schema import Base
 
 
 #allow for user input if they have postgres setup on their personal device
@@ -53,39 +45,6 @@ except Exception as error:
 
 # Connect to SQLAlchemy engine
 engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
-
-# Declare database models using SQLAlchemy ORM
-class Base(DeclarativeBase):
-    pass
-Base.metadata
-
-# Declaring mapped classes with the appropriate ORM format.
-class implantRecords(Base):
-    __tablename__ = "Implants"
-    Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    OS: Mapped[str] = mapped_column(String(64))
-    Arch: Mapped[str] =  mapped_column(String(64))
-    Arch: Mapped[str] =  mapped_column(String(64))
-    IPv4: Mapped[str] = mapped_column(String(64))
-    Hostname: Mapped[str] = mapped_column(String(64))
-    Username: Mapped[str] = mapped_column(String(64))
-    PID: Mapped[int] = mapped_column
-    ImplantUpTime: Mapped[datetime.datetime] = TIMESTAMP(timezone = True)
-    
-class lootRecords(Base):
-    __tablename__ = "Loot"
-    Loot_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    Loot_Type: Mapped[str] = mapped_column(String(64))
-    Implant_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Implants.Implant_UUID"), nullable = False, default=uuid.uuid4)
-    Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("Operators.Operator_UUID"), nullable = False, default=uuid.uuid4)
-    CreatedAt: Mapped[datetime.datetime] = TIMESTAMP(timezone = True)
-
-class operatorRecords(Base):
-    __tablename__ = "Operators"
-
-    Operator_UUID: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    User: Mapped[str] = mapped_column(String(64))
-    Password: Mapped[str] = mapped_column(String(64))
 
 # create tables
 Base.metadata.create_all(engine)

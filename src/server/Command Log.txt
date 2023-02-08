@@ -1,0 +1,4 @@
+INFO:root:Accepted connection from ('127.0.0.1', 36606) | 66bc0a1c-cc40-4b19-909d-15be84bde873
+INFO:root:Command: exit
+INFO:root:Command: q
+INFO:root:Command: q

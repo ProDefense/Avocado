@@ -1,14 +1,16 @@
 # Handle registrations from new implants
 import threading
+import sys
+import os
 from queue import Queue
 from pb import implantpb_pb2
-from sqlalchemy import create_engine, engine, insert
 
-# TODO: Import db objects, add src/db/postgres to the system path and test
-#import sys
-#import os
-#db_module_path = os.getcwd() + '../../db'
-#sys.path.insert(0, db_module_path)
+# Import db objects
+from sqlalchemy import create_engine, engine, insert
+from sqlalchemy.orm import Session
+db_module_path = os.getcwd() + '/../db'
+sys.path.insert(0, db_module_path) # Necessary to import schema file
+from schema import Implants
 
 class Handler:
     def __init__(self, requestq: Queue):
@@ -17,9 +19,6 @@ class Handler:
     def start(self):
         t = threading.Thread(target=self._handle_registrations, args=())
         t.start()
-
-        # Connect to SQLAlchemy engine
-        engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
 
     # Handle incoming registrations
     def _handle_registrations(self):
@@ -39,11 +38,14 @@ class Handler:
                 registration.addr = str(addr)
 
             # TODO: Insert implants to database ... below script needs to be edited to define Implant class from ORM
-            # stmt = insert(Implants).values(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", 
-            #                                Username = registration.user.name, PID = registration.pid)
-            # with engine.connect() as conn:
-            #     result = conn.execute(stmt)
-            #     conn.commit()
+            # Connect to SQLAlchemy engine
+            engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
+            session = Session(engine)
+            implant = Implants(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", \
+                               Username = registration.user.name, PID = registration.pid)
+            session.add(implant)
+            session.commit()
+            session.close()
 
             # TODO: Log this part here instead of printing to stdout
             display = f"""
