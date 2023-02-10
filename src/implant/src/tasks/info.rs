@@ -1,17 +1,19 @@
 // Get info about the target machine
 use crate::pb::registration::User;
-use anyhow::{Context, Result, Ok};
-use sysinfo::{PidExt, SystemExt, UserExt, RefreshKind};
+use anyhow::{Context, Ok, Result};
+use sysinfo::{PidExt, RefreshKind, SystemExt, UserExt};
 
 pub struct Info {
     system: sysinfo::System,
-    username: String
+    username: String,
 }
 
 // Macro to get the current user
 macro_rules! current_user {
     ($self:ident) => {
-        $self.system.users()
+        $self
+            .system
+            .users()
             .iter()
             .find(|u| u.name() == $self.username)
             .context(0)
@@ -22,7 +24,7 @@ impl Info {
     pub fn new() -> Info {
         Info {
             system: sysinfo::System::new_with_specifics(RefreshKind::new().with_users_list()),
-            username: whoami::username()
+            username: whoami::username(),
         }
     }
 
@@ -38,7 +40,9 @@ impl Info {
 
     // Get the user running the implant
     pub fn user(&self) -> Result<User> {
-        let current_user = self.system.users()
+        let current_user = self
+            .system
+            .users()
             .iter()
             .find(|u| u.name() == self.username)
             .context(0)?;
@@ -53,10 +57,10 @@ impl Info {
 
     fn get_id(&self) -> Result<u32> {
         Ok(current_user!(self)?
-         .id()
-         .to_string()
-         .parse()
-         .unwrap_or_else(|_| u32::MAX))
+            .id()
+            .to_string()
+            .parse()
+            .unwrap_or_else(|_| u32::MAX))
     }
 
     #[cfg(target_os = "linux")]
@@ -79,11 +83,10 @@ impl Info {
             .iter()
             .map(|groupname| User {
                 id: 0,
-                name: groupname.to_string()
+                name: groupname.to_string(),
             })
             .collect();
 
         Ok(g)
     }
 }
-

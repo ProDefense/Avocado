@@ -4,11 +4,14 @@ import logging
 import socket
 import ssl
 import threading
+import urllib
 import uuid
 import sys
 from certs.certs import Certs
 from pb import implantpb_pb2
 from queue import Queue
+from typing import Tuple
+import urllib.parse
 
 
 # A thread safe dict of sessions and their ids
@@ -42,7 +45,8 @@ class Sessions:
 
 
 class Listener:
-    def __init__(self, requestq: Queue):
+    def __init__(self, requestq: Queue, endpoint: str):
+        self.host, self.port = self._parse_endpoint(endpoint)
         self.sessions = Sessions()
         # Automatically generate CA certificates for the server
         self.certs = Certs("server", client=False)
@@ -56,6 +60,16 @@ class Listener:
         t = threading.Thread(target=self._accept, args=(requestq,))
         t.start()
 
+    def _parse_endpoint(self, endpoint: str) -> Tuple[str, int]:
+        result = urllib.parse.urlsplit(f"//{endpoint}")
+        if result.hostname is None:
+            raise ValueError(f"Invalid hostname in endpoint {endpoint}")
+
+        if result.port is None:
+            raise ValueError(f"Invalid port in endpoint {endpoint}")
+
+        return result.hostname, result.port
+
     def _mtls_cfg(self, client_certs: Certs) -> ssl.SSLContext:
         # mTLS settings
         ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -67,7 +81,7 @@ class Listener:
     # Create a secure socket
     def _mkssock(self, ctx: ssl.SSLContext) -> ssl.SSLSocket:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("127.0.0.1", 31337))
+            s.bind((self.host, self.port))
             s.listen()
             return ctx.wrap_socket(s, server_side=True)
 
@@ -81,7 +95,7 @@ class Listener:
 
     def _handle_conn(self, requestq: Queue, conn: ssl.SSLSocket, addr):
         # Send the registration to the handler
-        data = conn.recv(1024)
+        data = conn.recv(2048)
         requestq.put((data, addr))
 
         # Add the session

@@ -58,7 +58,7 @@ class Profile:
 
 
 # A wrapper for the generate command
-def generate(implant_certs: Certs, target_os: str) -> Profile:
+def generate(implant_certs: Certs, endpoint: str, target_os: str) -> Profile:
     # Create a directory to store implant assets
     assets_dir = os.path.join(AVOCADO_ROOT, "implant_assets")
     try:
@@ -76,7 +76,7 @@ def generate(implant_certs: Certs, target_os: str) -> Profile:
 
     # Compile the implant.
     profile = Profile(
-        server_endpoint="127.0.0.1:31337",
+        server_endpoint=endpoint,
         implant_certs=implant_certs,
         out_dir=".",
         assets_dir=assets_dir,
