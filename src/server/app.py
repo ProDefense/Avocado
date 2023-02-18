@@ -77,6 +77,13 @@ class ConnectScreen(QMainWindow, Ui_ConnectScreen):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.connectScreenStyleSheet = self.loadStyleSheet()
+        self.setStyleSheet(self.connectScreenStyleSheet)
+
+    def loadStyleSheet(self):
+        remoteMachinesStyleSheet = open("stylesheets/connectScreen.css", "r")
+        return remoteMachinesStyleSheet.read()
+
 
 
 # Main app that connects widgets into one window
