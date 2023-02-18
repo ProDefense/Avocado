@@ -6,12 +6,13 @@ import sys
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtCore import QAbstractTableModel, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget
-from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget, QMenu
+from PyQt6.QtGui import QIcon, QAction
 
 from active_session_logic import ActiveSession
 from main_window import Ui_MainWindow
 from remote_machines import Ui_RemoteMachines
+from connect_screen import Ui_ConnectScreen
 
 DisplayRole = Qt.ItemDataRole.DisplayRole
 Horizontal = Qt.Orientation.Horizontal
@@ -71,6 +72,13 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
         return remoteMachinesStyleSheet.read()
 
 
+# Screen for connecting to C2 Server
+class ConnectScreen(QMainWindow, Ui_ConnectScreen):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+
+
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -84,6 +92,12 @@ class MainApp(QMainWindow, Ui_MainWindow):
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
 
+        # add connect button to Avocado menu bar
+        openConnectScreen = QAction(self)
+        openConnectScreen.setText("Connect")
+        openConnectScreen.triggered.connect(self.connectScreen)
+        self.menuAvocado.addAction(openConnectScreen)
+
         layout = QVBoxLayout()
         # add active session and remote machines table to one widget
         layout.addWidget(RemoteMachines())
@@ -96,6 +110,11 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.setStyleSheet(self.mainAppStyleSheet)
 
         self.setCentralWidget(widget)
+
+
+    def connectScreen(self):
+        self.w = ConnectScreen()
+        self.w.show()
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("stylesheets/mainWindowStyleSheet.css", "r")
