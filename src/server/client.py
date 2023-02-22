@@ -18,7 +18,7 @@ def main():
         elif (not data):
             print("no data")
         else:
-            print("[+]Recv: " + str(data.decode('ascii')))
+            print(str(data.decode('ascii')))
 
     s.close()
 
