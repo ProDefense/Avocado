@@ -22,8 +22,6 @@ class Sessions:
         # TODO: make sure the id doesn't already exist in the _sessions dict
         self._mutex.acquire()
         id = str(uuid.uuid4())
-        print ("################## conn:", conn)
-        print ("################## addr:", addr)
         self._sessions[id] = (conn, addr)
         self._mutex.release()
         return id
