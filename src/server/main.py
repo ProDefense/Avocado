@@ -20,7 +20,7 @@ class C2Server(object):
         self.shutdown = 0
 
         ## Generating stuff for implant comms ##
-        print("Listening for operators...")
+        print("Listening for implants...")
         self.requestq = Queue() #this is a shared que between the handler and the listner, which fills with implant registration
         self.implantlistener = mtls.Listener(self.requestq) #begins implant listener w/ mtls encryption
         self.handler = Handler(self.requestq)
@@ -28,7 +28,7 @@ class C2Server(object):
 
 
         ## Generating stuff for operator comms ##
-        print("Listening for implants...")
+        print("Listening for operators...")
         self.clients = dict()
 
         self.host = ''

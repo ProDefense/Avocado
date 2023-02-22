@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import socket
 
-def shell_cli(s, data):
+def shell_cli(s):
     userin = ""
     while True:
         userin = input("[session] > ") 
@@ -22,7 +22,7 @@ def main():
     s.connect((host,port))
 
     while True:
-        msg = input("$")
+        msg = input("[Avocado] > ")
 
         if msg.lower() == "exit":
             print("[+]Connection Terminated")
@@ -35,7 +35,7 @@ def main():
         data = s.recv(1024)
 
         if (msg.split()[0]=="use") and (data.decode('ascii').split()[0]=="Using"):
-            shell_cli(s, data)
+            shell_cli(s)
             continue
 
         elif (not data):
