@@ -1,3 +1,5 @@
+// Don't flash up the console window
+#![windows_subsystem = "windows"]
 use std::sync::mpsc;
 use std::thread;
 
