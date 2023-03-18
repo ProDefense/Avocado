@@ -11,7 +11,7 @@ def main():
     requestq = Queue()
     handler = Handler(requestq)
     handler.start()
-    endpoint = input("Enter Listner Address (Example: 172.17.0.1:31337)\n> ")
+    endpoint = input("Enter Listner Address (Example: 172.17.0.2:31337)\n> ")
     try:
         listener = mtls.Listener(requestq, endpoint)
     except Exception as e:

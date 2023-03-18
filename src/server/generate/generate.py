@@ -36,6 +36,8 @@ class Profile:
         path = os.environ["PATH"]
         args = ["/usr/bin/cargo", "build", "-Z", "unstable-options", "--manifest-path", cargo_toml_path, "--out-dir", self.out_dir, "--release"]
         if self.target_os == "linux":
+            args.extend(["-Z", "build-std=std,panic_abort",])
+            args.extend(["-Z", "build-std-features=panic_immediate_abort"])
             args.append("--target=x86_64-unknown-linux-musl")
         elif self.target_os == "windows":
             args.append("--target=x86_64-pc-windows-gnu")
