@@ -9,10 +9,10 @@ from PyQt6.QtCore import QAbstractTableModel, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget, QMenu
 from PyQt6.QtGui import QIcon, QAction
 
-from active_session_logic import ActiveSession
-from main_window import Ui_MainWindow
-from remote_machines import Ui_RemoteMachines
-from connect_screen import Ui_ConnectScreen
+from gui.active_session_logic import ActiveSession
+from gui.views.main_window import Ui_MainWindow
+from gui.views.remote_machines import Ui_RemoteMachines
+from gui.views.connect_screen import Ui_ConnectScreen
 
 DisplayRole = Qt.ItemDataRole.DisplayRole
 Horizontal = Qt.Orientation.Horizontal
@@ -68,7 +68,7 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
         self.implants.verticalHeader().setVisible(False)
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("stylesheets/remoteMachineStyleSheet.css", "r")
+        remoteMachinesStyleSheet = open("gui/resources/stylesheets/remoteMachineStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
 
 
@@ -81,7 +81,7 @@ class ConnectScreen(QMainWindow, Ui_ConnectScreen):
         self.setStyleSheet(self.connectScreenStyleSheet)
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("stylesheets/connectScreen.css", "r")
+        remoteMachinesStyleSheet = open("gui/resources/stylesheets/connectScreen.css", "r")
         return remoteMachinesStyleSheet.read()
 
 
@@ -124,7 +124,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.w.show()
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("stylesheets/mainWindowStyleSheet.css", "r")
+        remoteMachinesStyleSheet = open("gui/resources/stylesheets/mainWindowStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
 
 

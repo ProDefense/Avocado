@@ -2,8 +2,7 @@ import sys
 import socket
 
 from PyQt6.QtWidgets import QApplication, QWidget
-from active_session import Ui_Active_Session
-
+from gui.views.active_session import Ui_Active_Session
 
 class ActiveSession(QWidget, Ui_Active_Session):
     def __init__(self, s, parent=None):
@@ -37,7 +36,7 @@ class ActiveSession(QWidget, Ui_Active_Session):
 
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("stylesheets/activeSessionStyleSheet.css", "r")
+        remoteMachinesStyleSheet = open("gui/resources/stylesheets/activeSessionStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
 
 
