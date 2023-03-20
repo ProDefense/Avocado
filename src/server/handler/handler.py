@@ -37,7 +37,6 @@ class Handler:
             if len(registration.addr) < 1:
                 registration.addr = str(addr)
 
-            # TODO: Insert implants to database ... below script needs to be edited to define Implant class from ORM
             # Connect to SQLAlchemy engine
             engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
             session = Session(engine)
