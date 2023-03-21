@@ -14,7 +14,8 @@ message Message {
     RegistrationConfirmation = 2;
     ServerCmd = 3;
     ServerCmdOutput = 4;
-    Session = 5;
+    SessionInfo = 5;
+    SessionConnected = 6;
   }
   MessageType message_type = 1;
   bytes data = 2;
@@ -53,7 +54,7 @@ message ServerCmdOutput {
 }
 
 // Information about a session
-message Session {
+message SessionInfo {
   string id = 1;
   string addr = 2;
   string os = 3;
@@ -65,4 +66,9 @@ message Session {
   }
   User user = 5; // The user running the implant
   repeated User groups = 6; // The groups this user is a part of
+}
+
+// Confirmation that session in connected to operator
+message SessionConnected {
+  string addr = 1;
 }

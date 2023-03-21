@@ -1,25 +1,59 @@
 # Handle registrations from new implants
 import threading
 from queue import Queue
-from pb import implantpb_pb2
+from pb import operatorpb_pb2, implantpb_pb2
 from sqlalchemy import create_engine, engine, insert
 
 class Handler:
-    def __init__(self, requestq: Queue):
+    def __init__(self, requestq: Queue, clients: dict):
         self._requestq = requestq
+        self._clients = clients
+        self._implants = list() # implant is a pair of a registration and id
+
+    # Brodcast all current implant registrations to a new client
+    def brodcastImplants(self, client):
+        for implant in self._implants:
+            self._brodcast_implant(implant, [client])
+
+    # Brodcast new implant registration to all clients
+    def _brodcast_implant(self, implant, clients):
+        registration, id = implant
+
+        # converts the groups from implantpb groups to operatorpb groups
+        user_groups = [operatorpb_pb2.SessionInfo.User(id=group.id, name=group.name) for group in registration.groups]
+
+        # brodcast new session information to all clients
+        session_info = operatorpb_pb2.Message(
+            message_type=operatorpb_pb2.Message.MessageType.SessionInfo,
+            data=operatorpb_pb2.SessionInfo(
+                    id=str(id),
+                    addr=registration.addr,
+                    os=registration.os,
+                    pid=registration.pid,
+                    user=operatorpb_pb2.SessionInfo.User(
+                        id=registration.user.id,
+                        name=registration.user.name
+                    ),
+                    groups = user_groups
+                ).SerializeToString()
+        ).SerializeToString()
+
+        for c in clients:
+            c.send(session_info)
+        
 
     def start(self):
-        t = threading.Thread(target=self._handle_registrations, args=())
+        t = threading.Thread(target=self._handle_implants, args=())
         t.start()
 
         # Connect to SQLAlchemy engine
         engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
 
     # Handle incoming registrations
-    def _handle_registrations(self):
+    def _handle_implants(self):
         # Get items from the queue
         while True:
-            data, addr = self._requestq.get()
+            data, addr, id = self._requestq.get()
             self.readRegistration(data, addr)
 
     def readRegistration(self, data: bytes, addr):
@@ -48,3 +82,7 @@ class Handler:
                 user: {registration.user.name},
                 groups: {registration.groups}"""
             print(display)
+
+            new_implant = (registration,id)
+            self._implants.append(new_implant)
+            self._brodcast_implant(new_implant, self._clients)

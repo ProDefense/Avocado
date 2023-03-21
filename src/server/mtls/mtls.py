@@ -80,13 +80,13 @@ class Listener:
             threading.Thread(target=self._handle_conn, args=(requestq, conn, addr)).start()
 
     def _handle_conn(self, requestq: Queue, conn: ssl.SSLSocket, addr):
-        # Send the registration to the handler
-        data = conn.recv(1024)
-        requestq.put((data, addr))
-
         # Add the session
         id = self.sessions.add(conn, addr)
         print(f"implant ID: {id}")
+
+        # Send the registration to the handler with session id
+        data = conn.recv(1024)
+        requestq.put((data, addr, id))
 
         # TODO: Authenticate the implant before sending a confirmation
         confirmation = implantpb_pb2.Message(
