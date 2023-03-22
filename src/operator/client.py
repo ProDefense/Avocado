@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import threading
-from pb import operatorpb_pb2
 from listener.listener import Listener
 from queue import Queue
 
@@ -8,9 +7,11 @@ from queue import Queue
 def implantHandler(implantq):
     while True:
         new_implant = implantq.get()
+
         if new_implant:
             print("New implant connected!")
             # do whatever with the new implant
+
         else:
             break
 
@@ -82,9 +83,7 @@ def main():
     threading.Thread(target=implantHandler, args=(implantq,)).start()
     threading.Thread(target=sessionHandler, args=(sessionq,listener, output_received, session_closed)).start()
     threading.Thread(target=outputHandler, args=(outputq, output_received)).start()
-
     threading.Thread(target=inputHandler, args=(listener, output_received, session_closed, "Avocado")).start()
-
 
 if __name__ == '__main__':
     main()
