@@ -32,7 +32,7 @@ class C2Server(object):
         self.handler = Handler(self.requestq, self.clients)
         self.handler.start()
 
-        self.host = ''
+        self.host = ""
         self.port = 12345
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -95,7 +95,7 @@ class C2Server(object):
             return
 
         elif command[0] == "sessions":
-            return str(self.implantlistener.sessions.list()).encode('ascii')
+            return str(self.implantlistener.sessions.list()).encode("ascii")
 
         # Interact with a session
         elif command[0] == "use":

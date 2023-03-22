@@ -47,7 +47,7 @@ class Handler:
         t.start()
 
         # Connect to SQLAlchemy engine
-        engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
+        engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5432/test_db")
 
     # Handle incoming registrations
     def _handle_implants(self):

@@ -85,5 +85,5 @@ def main():
     threading.Thread(target=outputHandler, args=(outputq, output_received)).start()
     threading.Thread(target=inputHandler, args=(listener, output_received, session_closed, "Avocado")).start()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -47,7 +47,7 @@ class ActiveSession(QWidget, Ui_Active_Session):
         return remoteMachinesStyleSheet.read()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = ActiveSession()
     widget.show()

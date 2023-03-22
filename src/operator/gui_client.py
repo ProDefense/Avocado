@@ -171,7 +171,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         return remoteMachinesStyleSheet.read()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("Avocado")
     path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "assets/avocadologo.png")
