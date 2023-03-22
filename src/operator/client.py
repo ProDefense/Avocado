@@ -1,44 +1,37 @@
 #!/usr/bin/env python3
-import socket
 import threading
 from pb import operatorpb_pb2
+from listener.listener import Listener
 
 # convert message to protobuf and send to server
-def sendServer(message, server):
-    server_cmd = operatorpb_pb2.ServerCmd(cmd=message.encode("ascii"))
-    message = operatorpb_pb2.Message(
-        message_type=operatorpb_pb2.Message.MessageType.ServerCmd, 
-        data=server_cmd.SerializeToString()
-    )
-    server.send(message.SerializeToString())
 
-def shell_cli (server, command_sent, session_enabled):
-    session_enabled.clear()  
+def shell_cli (listener, response_received, session_closed):
+    session_closed.clear()  
 
     while True:
-        command_sent.wait()
+        response_received.wait()
         userin = input("[session] > ") 
 
         if not userin:
             continue
 
-        sendServer(userin, server)
+        listener.send(userin)
 
         if (userin=="exit"):
             break
 
-        command_sent.clear()
+        response_received.clear()
 
-    session_enabled.set()  
+    session_closed.set()  
 
-def listen(server, command_sent, session_enabled):
-    while True: 
-        data = server.recv(1024)
+def handler(listener, response_received, session_closed):
+    while True:
+        message = listener.listen() 
 
-        message = operatorpb_pb2.Message()
-        message.ParseFromString(data)
+        if not message:
+            break
 
-        if message.message_type == operatorpb_pb2.Message.MessageType.SessionInfo:
+        elif message.message_type == operatorpb_pb2.Message.MessageType.SessionInfo:
             session_info = operatorpb_pb2.SessionInfo()
             session_info.ParseFromString(message.data)
             print("New session!")
@@ -53,28 +46,22 @@ def listen(server, command_sent, session_enabled):
             session_connected.ParseFromString(message.data)
             print(f"Connected to session {session_connected.addr}")
 
-            t = threading.Thread(target=shell_cli, args=(server, command_sent, session_enabled,))
-            t.start()
+            threading.Thread(target=shell_cli, args=(listener, response_received, session_closed)).start()
 
-        elif (not data):
-            break
+        response_received.set() 
 
-        command_sent.set() 
-    server.close()
-
-def cli(server, command_sent, session_enabled):
+def cli(listener, response_received, session_closed):
     while True:
-        # Wait until the server replies or session closed before prompting for input
-        command_sent.wait()
-        session_enabled.wait()
+        response_received.wait()
+        session_closed.wait()
 
         msg = input("[Avocado] > ")
 
         if not msg:
             continue
 
-        command_sent.clear()  
-        sendServer(msg, server)
+        response_received.clear()  
+        listener.send(msg)
 
         if msg.lower() == "exit":
             print("[+]Connection Terminated")
@@ -82,24 +69,22 @@ def cli(server, command_sent, session_enabled):
 
 def main():
     # TODO prompt the user to enter host/port instead
-    host = "127.0.0.1"
+    hostname = "127.0.0.1"
     port = 12345
 
-    server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    server.connect((host,port))
+    listener = Listener(hostname, port)
 
-    # command_sent and session_enabled are workarounds for some i/o issues
+    # response_received and session_closed are workarounds for some i/o issues
     # e.g. the server response overwrites the user input prompt
 
-    command_sent = threading.Event()  
-    session_enabled = threading.Event()  
-    command_sent.set()  
-    session_enabled.set()  
+    response_received = threading.Event()  
+    session_closed = threading.Event()  
+    response_received.set()  
+    session_closed.set()  
 
-    t = threading.Thread(target=listen, args=(server, command_sent, session_enabled, ))
-    t.start()
+    threading.Thread(target=handler, args=(listener, response_received, session_closed)).start()
 
-    cli(server, command_sent, session_enabled)
+    cli(listener, response_received, session_closed)
 
 if __name__ == '__main__':
     main()
