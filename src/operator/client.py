@@ -2,39 +2,48 @@
 import threading
 from pb import operatorpb_pb2
 from listener.listener import Listener
+from queue import Queue
 
-# handles messages received from the server
-def handler(listener, response_received, session_closed):
+# handle new implants
+def implantHandler(implantq):
     while True:
-        message = listener.listen() 
-
-        if not message:
+        new_implant = implantq.get()
+        if new_implant:
+            print("New implant connected!")
+            # do whatever with the new implant
+        else:
             break
 
-        elif message.message_type == operatorpb_pb2.Message.MessageType.SessionInfo:
-            session_info = operatorpb_pb2.SessionInfo()
-            session_info.ParseFromString(message.data)
-            print("New session!")
-
-        elif message.message_type == operatorpb_pb2.Message.MessageType.ServerCmdOutput:
-            cmd_output = operatorpb_pb2.ServerCmdOutput()
-            cmd_output.ParseFromString(message.data)
-            print(cmd_output.cmdOutput)
-
-        elif message.message_type == operatorpb_pb2.Message.MessageType.SessionConnected:
-            session_connected = operatorpb_pb2.SessionConnected()
-            session_connected.ParseFromString(message.data)
-            print(f"Connected to session {session_connected.addr}")
-
-            #threading.Thread(target=shell_cli, args=(listener, response_received, session_closed)).start()
-            session_closed.clear()
-            threading.Thread(target=cli, args=(listener, response_received, session_closed, "Session")).start()
-
-        response_received.set() 
-
-def cli(listener, response_received, session_closed, title):
+# handle new session connections
+def sessionHandler(sessionq, listener, output_received, session_closed):
     while True:
-        response_received.wait()
+        new_session = sessionq.get()
+
+        if new_session:
+            print(f"Connected to session {new_session.addr}")
+            session_closed.clear()
+            output_received.set() 
+            threading.Thread(target=inputHandler, args=(listener, output_received, session_closed, "Session")).start()
+
+        else:
+            break
+
+# prints output messages received from the server
+def outputHandler(outputq, output_received):
+    while True:
+        output = outputq.get()
+
+        if not output:
+            break
+
+        else:
+            print(output)
+
+        output_received.set() 
+
+def inputHandler(listener, output_received, session_closed, title):
+    while True:
+        output_received.wait()
         if (title=="Avocado"):
             session_closed.wait()
 
@@ -43,7 +52,7 @@ def cli(listener, response_received, session_closed, title):
         if not msg:
             continue
 
-        response_received.clear()  
+        output_received.clear()  
         listener.send(msg)
 
         if msg.lower() == "exit":
@@ -57,20 +66,25 @@ def main():
     hostname = "127.0.0.1"
     port = 12345
 
-    listener = Listener(hostname, port)
+    implantq = Queue()
+    sessionq = Queue()
+    outputq = Queue()
 
-    # response_received and session_closed are workarounds for some i/o issues
+    listener = Listener(hostname, port, outputq, implantq, sessionq)
+
+    # output_received and session_closed are workarounds for some i/o issues
     # e.g. the server response overwrites the user input prompt
-
-    response_received = threading.Event()  
+    output_received = threading.Event()  
     session_closed = threading.Event()  
-    response_received.set()  
+    output_received.set()  
     session_closed.set()  
 
-    threading.Thread(target=handler, args=(listener, response_received, session_closed)).start()
-    threading.Thread(target=cli, args=(listener, response_received, session_closed, "Avocado")).start()
+    threading.Thread(target=implantHandler, args=(implantq,)).start()
+    threading.Thread(target=sessionHandler, args=(sessionq,listener, output_received, session_closed)).start()
+    threading.Thread(target=outputHandler, args=(outputq, output_received)).start()
 
-    #cli(listener, response_received, session_closed)
+    threading.Thread(target=inputHandler, args=(listener, output_received, session_closed, "Avocado")).start()
+
 
 if __name__ == '__main__':
     main()
