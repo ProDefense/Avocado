@@ -3,27 +3,7 @@ import threading
 from pb import operatorpb_pb2
 from listener.listener import Listener
 
-# convert message to protobuf and send to server
-
-def shell_cli (listener, response_received, session_closed):
-    session_closed.clear()  
-
-    while True:
-        response_received.wait()
-        userin = input("[session] > ") 
-
-        if not userin:
-            continue
-
-        listener.send(userin)
-
-        if (userin=="exit"):
-            break
-
-        response_received.clear()
-
-    session_closed.set()  
-
+# handles messages received from the server
 def handler(listener, response_received, session_closed):
     while True:
         message = listener.listen() 
@@ -46,16 +26,19 @@ def handler(listener, response_received, session_closed):
             session_connected.ParseFromString(message.data)
             print(f"Connected to session {session_connected.addr}")
 
-            threading.Thread(target=shell_cli, args=(listener, response_received, session_closed)).start()
+            #threading.Thread(target=shell_cli, args=(listener, response_received, session_closed)).start()
+            session_closed.clear()
+            threading.Thread(target=cli, args=(listener, response_received, session_closed, "Session")).start()
 
         response_received.set() 
 
-def cli(listener, response_received, session_closed):
+def cli(listener, response_received, session_closed, title):
     while True:
         response_received.wait()
-        session_closed.wait()
+        if (title=="Avocado"):
+            session_closed.wait()
 
-        msg = input("[Avocado] > ")
+        msg = input(f"[{title}] > ")
 
         if not msg:
             continue
@@ -64,8 +47,10 @@ def cli(listener, response_received, session_closed):
         listener.send(msg)
 
         if msg.lower() == "exit":
-            print("[+]Connection Terminated")
+            print(f"[+]{title} Terminated")
             break
+
+    session_closed.set()
 
 def main():
     # TODO prompt the user to enter host/port instead
@@ -83,8 +68,9 @@ def main():
     session_closed.set()  
 
     threading.Thread(target=handler, args=(listener, response_received, session_closed)).start()
+    threading.Thread(target=cli, args=(listener, response_received, session_closed, "Avocado")).start()
 
-    cli(listener, response_received, session_closed)
+    #cli(listener, response_received, session_closed)
 
 if __name__ == '__main__':
     main()
