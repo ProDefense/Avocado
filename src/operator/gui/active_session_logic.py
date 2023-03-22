@@ -40,7 +40,6 @@ class ActiveSession(QWidget, Ui_Active_Session):
 
         if msg.lower() == "exit":
             self.guiPrint("[+]Connection Terminated")
-            #########################self.listener.close() 
             exit()
 
     def loadStyleSheet(self):
