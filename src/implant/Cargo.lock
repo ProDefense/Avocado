@@ -10,9 +10,9 @@ checksum = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234"
 
 [[package]]
 name = "anyhow"
-version = "1.0.66"
+version = "1.0.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "216261ddc8289130e551ddcd5ce8a064710c0d064a4d2895c67151c92b5443f6"
+checksum = "2cb2f989d18dd141ab8ae82f64d1a8cdd37e0840f73a406896cf5e99502fab61"
 
 [[package]]
 name = "autocfg"
@@ -22,9 +22,9 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "base64"
-version = "0.13.0"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
+checksum = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a"
 
 [[package]]
 name = "bitflags"
@@ -248,6 +248,7 @@ dependencies = [
  "rustls-pemfile",
  "sysinfo",
  "users",
+ "whoami",
 ]
 
 [[package]]
@@ -451,9 +452,9 @@ dependencies = [
 
 [[package]]
 name = "prost"
-version = "0.11.2"
+version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0841812012b2d4a6145fae9a6af1534873c32aa67fff26bd09f8fa42c83f95a"
+checksum = "21dc42e00223fc37204bd4aa177e69420c604ca4a183209a8f9de30c6d934698"
 dependencies = [
  "bytes",
  "prost-derive",
@@ -461,9 +462,9 @@ dependencies = [
 
 [[package]]
 name = "prost-build"
-version = "0.11.2"
+version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d8b442418ea0822409d9e7d047cbf1e7e9e1760b172bf9982cf29d517c93511"
+checksum = "a3f8ad728fb08fe212df3c05169e940fbb6d9d16a877ddde14644a983ba2012e"
 dependencies = [
  "bytes",
  "heck",
@@ -483,9 +484,9 @@ dependencies = [
 
 [[package]]
 name = "prost-derive"
-version = "0.11.0"
+version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7345d5f0e08c0536d7ac7229952590239e77abf0a0100a1b1d890add6ea96364"
+checksum = "8bda8c0881ea9f722eb9629376db3d0b903b462477c1aafcb0566610ac28ac5d"
 dependencies = [
  "anyhow",
  "itertools",
@@ -496,9 +497,9 @@ dependencies = [
 
 [[package]]
 name = "prost-types"
-version = "0.11.1"
+version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4dfaa718ad76a44b3415e6c4d53b17c8f99160dcb3a99b10470fce8ad43f6e3e"
+checksum = "a5e0526209433e96d83d750dd81a99118edbc55739e7e61a46764fd2ad537788"
 dependencies = [
  "bytes",
  "prost",
@@ -640,9 +641,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.20.7"
+version = "0.20.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "539a2bfe908f471bfa933876bd1eb6a19cf2176d375f82ef7f99530a40e48c2c"
+checksum = "fff78fc74d175294f4e83b28343315ffcfb114b156f0185e9741cb5570f50e2f"
 dependencies = [
  "log",
  "ring",
@@ -652,9 +653,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-pemfile"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0864aeff53f8c05aa08d86e5ef839d3dfcf07aeba2db32f12db0ef716e87bd55"
+checksum = "d194b56d58803a43635bdc398cd17e383d6f71f9182b9a192c127ca42494a59b"
 dependencies = [
  "base64",
 ]
@@ -723,9 +724,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.26.8"
+version = "0.27.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29ddf41e393a9133c81d5f0974195366bd57082deac6e0eb02ed39b8341c2bb6"
+checksum = "c215311383d25d03753375c53ab9fad8fc0cf46953c409211e065edeabf577ee"
 dependencies = [
  "cfg-if",
  "core-foundation-sys",
@@ -904,6 +905,16 @@ dependencies = [
  "either",
  "libc",
  "once_cell",
+]
+
+[[package]]
+name = "whoami"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "45dbc71f0cdca27dc261a9bd37ddec174e4a0af2b900b890f378460f745426e3"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
