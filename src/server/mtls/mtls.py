@@ -10,27 +10,27 @@ import sys
 from certs.certs import Certs
 from pb import implantpb_pb2
 from queue import Queue
-from typing import Tuple
 import urllib.parse
+from typing import Tuple, Dict
 
 
 # A thread safe dict of sessions and their ids
 class Sessions:
     def __init__(self):
         self._mutex = threading.Lock()
-        self._sessions = dict()
+        self._sessions: Dict[uuid.UUID, Tuple] = dict()
 
     # Add a connection and an address
     def add(self, conn, addr) -> str:
         # TODO: make sure the id doesn't already exist in the _sessions dict
         self._mutex.acquire()
-        id = str(uuid.uuid4())
+        id = uuid.uuid4()
         self._sessions[id] = (conn, addr)
         self._mutex.release()
-        return id
+        return str(id)
 
     # Get the connection by the session ID
-    def get(self, id):
+    def get(self, id: uuid.UUID):
         self._mutex.acquire()
         conn, addr = self._sessions[id]
         self._mutex.release()
@@ -47,7 +47,7 @@ class Sessions:
 class Listener:
     def __init__(self, requestq: Queue, endpoint: str):
         self.host, self.port = self._parse_endpoint(endpoint)
-        self.sessions = Sessions()
+        self.sessions: Sessions = Sessions()
         # Automatically generate CA certificates for the server
         self.certs = Certs("server", client=False)
 

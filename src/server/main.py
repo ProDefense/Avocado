@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # TODO: Convert CLI to CMD2
 import logging
+from console import console
 from mtls import mtls
-from generate.generate import generate
+# from compile.generate import generate
 from queue import Queue
 from handler.handler import Handler
 
@@ -18,40 +19,9 @@ def main():
         print(e)
         exit(1)
 
-    while True:
-        userin = input("> ")
-        userin = userin.split()
+    logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
 
-        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-        commandStr = ' '.join(userin)
-        logging.info("Command: " + commandStr)
-
-        if len(userin) < 1:
-            continue
-        # Print sessions
-        elif userin[0] == "sessions":
-            for id in listener.sessions.list():
-                print(id)
-        # Interact with a session
-        elif userin[0] == "use":
-            if len(userin) == 2:
-                conn, addr = listener.sessions.get(userin[1])
-                print(f"Using session with {addr}")
-                mtls.session(conn)
-            else:
-                print("Usage: use <session>")
-        # Compile an implant
-        elif userin[0] == "generate":
-            if len(userin) != 3:
-                print("Usage: generate <endpoint> linux|windows")
-                continue
-
-            if userin[2] != "linux" and userin[2] != "windows":
-                print("Usage: generate 172.17.0.1:1337 linux|windows")
-                continue
-
-            print("Generating the implant...")
-            generate(listener.client_certs, userin[1], userin[2])
+    console.console(obj=listener)
 
 
 if __name__ == "__main__":
