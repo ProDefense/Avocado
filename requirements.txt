@@ -4,4 +4,4 @@ PyQt6==6.4.0
 PyQt6-Qt6==6.4.0
 PyQt6-sip==13.4.0
 shiboken6==6.4.0
-SQLAlchemy==1.4.45
+SQLAlchemy==2.0.7
