@@ -1,3 +1,5 @@
+#Added line 2 to see if this works - RJ
+FROM postgres:latest
 FROM archlinux
 
 # WARNING: This docker file is used for testing only.
@@ -22,3 +24,4 @@ RUN \
   echo "alias ls='ls --color'" >> $HOME/.bashrc
 
 CMD [ "/bin/bash" ]
+#sudo docker run --rm --name avocado -p 5433:5432 -e POSTGRES_PASSWORD=mysecretpassword -it avocado
