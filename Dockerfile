@@ -6,7 +6,9 @@ FROM archlinux
 
 RUN \
   pacman -Sy base-devel rustup python python-pip protobuf mkcert mingw-w64-gcc musl --noconfirm && \
+  pacman -Sy postgresql-client --noconfirm && \
   useradd -M avocado
+
 
 COPY . /home/avocado
 RUN chown -R avocado:avocado /home/avocado
