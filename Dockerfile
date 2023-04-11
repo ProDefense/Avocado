@@ -15,6 +15,7 @@ USER avocado
 
 RUN \
   pip install -r requirements.txt && \
+  pip install psycopg2 \
   rustup default nightly && \
   rustup target add x86_64-unknown-linux-musl && \
   rustup target add x86_64-pc-windows-gnu && \
