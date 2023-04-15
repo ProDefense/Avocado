@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 import os
-import socket
 import sys
 import threading
 from queue import Queue
 
-from PyQt6 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget, QMenu, QAbstractItemView, QHeaderView
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QAbstractItemView, QHeaderView
 from PyQt6.QtGui import QIcon, QAction
 
 from gui.active_session_logic import TabWidget
@@ -128,11 +127,8 @@ class MainApp(QMainWindow, Ui_MainWindow):
         port = 12345
 
         implantq = Queue()
-        sessionq = Queue()
-        outputq = Queue()
         session_outputq = Queue()
-
-        listener = Listener(hostname, port, outputq, session_outputq, implantq, sessionq)
+        listener = Listener(hostname, port, session_outputq, implantq)
 
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
@@ -149,7 +145,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         layout = QVBoxLayout()
 
         # add active session and remote machines table to one widget
-        tabwidget = TabWidget(listener,outputq,session_outputq,sessionq)
+        tabwidget = TabWidget(listener,session_outputq)
         self.remote_machines = RemoteMachines(tabwidget)
 
         layout.addWidget(self.remote_machines)
@@ -179,7 +175,6 @@ class MainApp(QMainWindow, Ui_MainWindow):
 
             else:
                 break
-
 
     def connectScreen(self):
         self.w = ConnectScreen()

@@ -1,64 +1,27 @@
 import sys
-import socket
 import threading
 
 from PyQt6.QtWidgets import QApplication, QWidget, QTabWidget, QVBoxLayout, QDialog
 from gui.views.active_session import Ui_Active_Session
 
-from pb import operatorpb_pb2
-
 class TabWidget(QDialog):
-    def __init__(self, listener, outputq, session_outputq, sessionq):
+    def __init__(self, listener, session_outputq):
         super().__init__()
 
         self.tab_id = {}
         self.listener = listener
-        self.outputq = outputq
-        #self.session_outputq = session_outputq
-        self.sessionq = sessionq
-        #threading.Thread(target=self.sessionHandler, args=(sessionq,)).start()
 
         self.tabwidget = QTabWidget()
-
         vbox = QVBoxLayout()
         vbox.addWidget(self.tabwidget)
         self.setLayout(vbox)
 
-    #    threading.Thread(target=self.outputHandler, args=(outputq,)).start()
         threading.Thread(target=self.sessionOutputHandler, args=(session_outputq,)).start()
 
     def newTab(self, id, user, os):
-        self.listener.send(f"use {id}")
-
         tab = self.tabwidget.addTab(ActiveSession(self.listener, id, self.tab_id, self.tabwidget,f"{user}/{os}"), f"{user}/{os}")
 
         self.tab_id[id] = tab
-
-    '''
-    # handle new session connections
-    def sessionHandler(self, sessionq):
-        while True:
-            new_session = sessionq.get()
-
-            if new_session:
-                print(f"Connected to session {new_session.addr}")
-
-            else:
-                break
-
-    # prints output messages received from the server
-    def outputHandler(self, outputq):
-        while True:
-            #output, id = outputq.get()
-            output = outputq.get()
-
-            if not output:
-                break
-
-            else:
-                #self.guiPrint(output)
-                pass
-    '''
 
     # prints output messages received from the server
     def sessionOutputHandler(self, session_outputq):
@@ -70,13 +33,8 @@ class TabWidget(QDialog):
 
             else:
                 tab = self.tab_id[id]
-
                 self.tabwidget.widget(tab).terminalOutput.appendPlainText(output)
                 self.tabwidget.widget(tab).terminalOutput.verticalScrollBar().setValue(self.tabwidget.widget(tab).terminalOutput.verticalScrollBar().maximum())
-
-    def guiPrint(self, text):
-        self.terminalOutput.appendPlainText(text)
-        self.terminalOutput.verticalScrollBar().setValue(self.terminalOutput.verticalScrollBar().maximum())
 
 
 class ActiveSession(QWidget, Ui_Active_Session):
@@ -86,7 +44,6 @@ class ActiveSession(QWidget, Ui_Active_Session):
         self.id = id
         self.tab_id = tab_id
 
-
         self.machineName.setText(title)
         self.terminalInput.returnPressed.connect(self.inputHandler)
 
@@ -94,7 +51,6 @@ class ActiveSession(QWidget, Ui_Active_Session):
         self.setStyleSheet(self.activeSessionStyleSheet)
         self.listener = listener
         self.tabwidget = tabwidget
-
 
     def inputHandler(self):
         msg = self.terminalInput.text()
