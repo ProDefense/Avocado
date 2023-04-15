@@ -47,42 +47,15 @@ background-color:#16161D
     <property name="title">
      <string>Avocado</string>
     </property>
-    <addaction name="actionAbout"/>
-    <addaction name="actionPlaceholder_2"/>
-    <addaction name="separator"/>
-    <addaction name="actionPreferences"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuit_Avocado"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menuImplant">
     <property name="title">
-     <string>View</string>
+     <string>Implant</string>
     </property>
-    <addaction name="actionPlaceholder"/>
-   </widget>
-   <widget class="QMenu" name="menuAttack">
-    <property name="title">
-     <string>Attack</string>
-    </property>
-    <addaction name="actionPlaceholder_3"/>
-   </widget>
-   <widget class="QMenu" name="menuScripts">
-    <property name="title">
-     <string>Scripts</string>
-    </property>
-    <addaction name="actionPlaceholder_4"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionPlaceholder_5"/>
+    <addaction name="generateAction"/>
    </widget>
    <addaction name="menuAvocado"/>
-   <addaction name="menuView"/>
-   <addaction name="menuAttack"/>
-   <addaction name="menuScripts"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menuImplant"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAbout">
@@ -116,9 +89,9 @@ background-color:#16161D
     <string>Placeholder</string>
    </property>
   </action>
-  <action name="actionPlaceholder_3">
+  <action name="generateAction">
    <property name="text">
-    <string>Placeholder</string>
+    <string>Generate</string>
    </property>
   </action>
   <action name="actionPlaceholder_4">

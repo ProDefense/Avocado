@@ -137,6 +137,8 @@ class MainApp(QMainWindow, Ui_MainWindow):
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
 
+        self.generateAction.triggered.connect(lambda: listener.send("generate"))
+
         # add connect button to Avocado menu bar
         openConnectScreen = QAction(self)
         openConnectScreen.setText("Connect")
