@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui/active_session.ui'
+# Form implementation generated from reading ui file 'gui/resources/ui/active_session.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.0
 #
@@ -54,13 +54,6 @@ class Ui_Active_Session(object):
         self.horizontalLayout.setContentsMargins(10, -1, 0, -1)
         self.horizontalLayout.setSpacing(5)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.label_2 = QtWidgets.QLabel(Active_Session)
-        font = QtGui.QFont()
-        font.setFamily("Monaco")
-        font.setUnderline(True)
-        self.label_2.setFont(font)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout.addWidget(self.label_2)
         self.label_3 = QtWidgets.QLabel(Active_Session)
         font = QtGui.QFont()
         font.setFamily("Monaco")
@@ -99,5 +92,4 @@ class Ui_Active_Session(object):
         _translate = QtCore.QCoreApplication.translate
         Active_Session.setWindowTitle(_translate("Active_Session", "Form"))
         self.machineName.setText(_translate("Active_Session", "subaru/WIN-03-91K"))
-        self.label_2.setText(_translate("Active_Session", "avocado"))
         self.label_3.setText(_translate("Active_Session", ">"))

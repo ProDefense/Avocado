@@ -7,11 +7,11 @@ import threading
 from queue import Queue
 
 from PyQt6 import QtCore, QtWidgets, QtGui
-from PyQt6.QtCore import QAbstractTableModel, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget, QMenu
+from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QStyle, QVBoxLayout, QWidget, QMenu, QAbstractItemView, QHeaderView
 from PyQt6.QtGui import QIcon, QAction
 
-from gui.active_session_logic import ActiveSession
+from gui.active_session_logic import TabWidget
 from gui.views.main_window import Ui_MainWindow
 from gui.views.remote_machines import Ui_RemoteMachines
 from gui.views.connect_screen import Ui_ConnectScreen
@@ -27,13 +27,14 @@ class RemoteMachinesModel(QAbstractTableModel):
         self.machines = machines
         self.headers = headers
 
-    def rowCount(self, parent):
+
+    def rowCount(self, parent=QModelIndex()):
         return len(self.machines)
 
-    def columnCount(self, parent):
-        return 4
+    def columnCount(self, parent=QModelIndex()):
+        return 5
 
-    def data(self, index, role):
+    def data(self, index, role=DisplayRole):
         if not index.isValid():
             return QtCore.QVariant()
         elif role != DisplayRole:
@@ -47,13 +48,33 @@ class RemoteMachinesModel(QAbstractTableModel):
             return QtCore.QVariant(self.headers[section])
         return QtCore.QVariant(int(section + 1))
 
+    def getId(self, index, role=DisplayRole):
+        if not index.isValid():
+            return QtCore.QVariant()
+        elif role != DisplayRole:
+            return QtCore.QVariant()
+        return QtCore.QVariant(self.machines[index.row()][0])
+    def getOs(self, index, role=DisplayRole):
+        if not index.isValid():
+            return QtCore.QVariant()
+        elif role != DisplayRole:
+            return QtCore.QVariant()
+        return QtCore.QVariant(self.machines[index.row()][2])
+
+    def getUser(self, index, role=DisplayRole):
+        if not index.isValid():
+            return QtCore.QVariant()
+        elif role != DisplayRole:
+            return QtCore.QVariant()
+        return QtCore.QVariant(self.machines[index.row()][4])
 class RemoteMachines(QWidget, Ui_RemoteMachines):
-    def __init__(self):
+    def __init__(self, tabwidget):
+        self.tabwidget = tabwidget
         super(RemoteMachines, self).__init__()
         self.setupUi(self)
 
         self.implant_list: list = []
-        self.header = ["addr", "os", "pid", "user"]
+        self.header = ["id", "addr", "os", "pid", "user"]
 
         self._remoteMachinesModel = RemoteMachinesModel(self.implant_list, self.header)
 
@@ -62,8 +83,20 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
         self.implants.setStyleSheet(self.remoteMachinesStyleSheet)
         self.implants.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.implants.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.implants.resizeColumnsToContents()
+        self.implants.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.implants.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.implants.verticalHeader().setVisible(False)
+
+        self.implants.doubleClicked.connect(self.interact)
+
+
+
+    def interact(self, index):
+        id = self.implants.model().getId(index).value()
+        user = self.implants.model().getUser(index).value()
+        os = self.implants.model().getOs(index).value()
+        self.tabwidget.newTab(id, user, os)
+
 
 
     def loadStyleSheet(self):
@@ -72,14 +105,7 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
 
     def addImplant(self, new_implant):
         self.implant_list.append(new_implant)
-        # Update the model with the new data
-        self._remoteMachinesModel.beginInsertRows(QtCore.QModelIndex(), len(self.implant_list) - 1, len(self.implant_list) - 1)
-        self._remoteMachinesModel.endInsertRows()
-
-        # Resize the columns to fit the data 
-        # TODO: figure out why it's not resizing properly
-        self.implants.setModel(self._remoteMachinesModel)
-        self.implants.resizeColumnsToContents()
+        self.implants.model().layoutChanged.emit()
 
 
 # Screen for connecting to C2 Server
@@ -118,11 +144,13 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.menuAvocado.addAction(openConnectScreen)
 
         layout = QVBoxLayout()
+
         # add active session and remote machines table to one widget
-        self.remote_machines = RemoteMachines()
+        tabwidget = TabWidget(listener,outputq,sessionq)
+        self.remote_machines = RemoteMachines(tabwidget)
 
         layout.addWidget(self.remote_machines)
-        layout.addWidget(ActiveSession(listener, outputq))
+        layout.addWidget(tabwidget)
         # widget holds layout
         widget = QWidget()
         widget.setLayout(layout)
@@ -133,15 +161,14 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.setCentralWidget(widget)
 
         threading.Thread(target=self.implantHandler, args=(implantq,)).start()
-        threading.Thread(target=self.sessionHandler, args=(sessionq,)).start()
 
     # handle new implants
     def implantHandler(self,implantq):
         while True:
             new_implant = implantq.get()
-
             if new_implant:
                 self.remote_machines.addImplant([
+                    new_implant.id,
                     new_implant.addr,
                     new_implant.os,
                     new_implant.pid,
@@ -150,17 +177,6 @@ class MainApp(QMainWindow, Ui_MainWindow):
             else:
                 break
 
-    # handle new session connections
-    def sessionHandler(self, sessionq):
-        while True:
-            new_session = sessionq.get()
-
-            if new_session:
-                print(f"Connected to session {new_session.addr}")
-                #threading.Thread(target=inputHandler, args=(listener, output_received, session_closed, "Session")).start()
-
-            else:
-                break
 
     def connectScreen(self):
         self.w = ConnectScreen()

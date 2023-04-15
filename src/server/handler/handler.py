@@ -54,9 +54,9 @@ class Handler:
         # Get items from the queue
         while True:
             data, addr, id = self._requestq.get()
-            self.readRegistration(data, addr)
+            self.readRegistration(data, addr, id)
 
-    def readRegistration(self, data: bytes, addr):
+    def readRegistration(self, data: bytes, addr, id):
         # Parse the incoming data
         message = implantpb_pb2.Message()
         message.ParseFromString(data)
