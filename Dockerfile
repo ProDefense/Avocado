@@ -25,9 +25,6 @@ RUN chown -R avocado:avocado /home/avocado
 WORKDIR /home/avocado
 USER avocado
 
-<<<<<<< HEAD
-RUN pip install -r requirements.txt
-=======
 RUN \
   pip install -r requirements.txt && \
   rustup default nightly && \
@@ -37,6 +34,5 @@ RUN \
   cargo check --release --target=x86_64-pc-windows-gnu --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked windows" && \
   cargo check --release --target=x86_64-unknown-linux-musl --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked linux" && \
   echo "alias ls='ls --color'" >> $HOME/.bashrc
->>>>>>> origin
 
 CMD [ "/bin/bash" ]

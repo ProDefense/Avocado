@@ -18,11 +18,11 @@ class Listener:
         self._server.shutdown(socket.SHUT_RDWR)
 
     # convert message to protobuf and send to server
-    def send(self, message):
-        server_cmd = operatorpb_pb2.ServerCmd(cmd=message.encode("ascii"))
+    def sendGenerate(self, endpoint, target_os):
+        generate_cmd = operatorpb_pb2.Generate(endpoint=endpoint.encode("ascii"), target_os=target_os.encode("ascii"))
         message = operatorpb_pb2.Message(
-            message_type=operatorpb_pb2.Message.MessageType.ServerCmd, 
-            data=server_cmd.SerializeToString()
+            message_type=operatorpb_pb2.Message.MessageType.Generate, 
+            data=generate_cmd.SerializeToString()
         )
         self._server.send(message.SerializeToString())
 

