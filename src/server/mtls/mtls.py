@@ -123,11 +123,14 @@ def session(conn: ssl.SSLSocket, userin):
             output.ParseFromString(message.data)
             logging.info(output.stdout)
 
+            result = b""
             if output.HasField("status") and output.code != 0:
-                return(b"Status code: " + output.code + b"\n")
+                result += f"Status code: {output.code}\n".encode()
 
             if len(output.stderr) > 0:
-                return(b"stdout:\n" +output.stdout + b"\nstderr:\n" + output.stderr)
+                result += b"stdout:\n" +output.stdout + b"\nstderr:\n" + output.stderr
 
             else:
-                return(output.stdout)
+                result += output.stdout
+
+            return result
