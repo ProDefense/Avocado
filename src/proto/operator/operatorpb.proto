@@ -9,50 +9,18 @@ package operatorpb;
 
 message Message {
   enum MessageType {
-    Error = 0;
-    Registration = 1;
-    RegistrationConfirmation = 2;
-    ServerCmd = 3;
-    ServerCmdOutput = 4;
-    SessionCmd = 5;
-    SessionCmdOutput = 6;
-    SessionInfo = 7;
-    SessionConnected = 8;
+    ServerCmd = 0;
+    SessionCmd = 1;
+    SessionCmdOutput = 2;
+    SessionInfo = 3;
   }
   MessageType message_type = 1;
   bytes data = 2;
 }
 
-message Error {
-  enum ErrorType {
-    MessageDecode = 0;
-    Registration = 1;
-    ServerCmd = 2;
-    Session = 3;
-  }
-  ErrorType error_type = 1;
-  string message = 2;
-}
-
-// Basic info about an operator
-message Registration {
-  string addr = 1;
-  string name = 2;
-}
-
-// TODO: Add actual authentication
-message RegistrationConfirmation {
-  string id = 1;
-}
-
 // Command to send to server
 message ServerCmd {
   string cmd = 1;
-}
-
-// Output from server
-message ServerCmdOutput {
-  string cmdOutput = 1;
 }
 
 // Command to send to session
@@ -80,9 +48,4 @@ message SessionInfo {
   }
   User user = 5; // The user running the implant
   repeated User groups = 6; // The groups this user is a part of
-}
-
-// Confirmation that session in connected to operator
-message SessionConnected {
-  string addr = 1;
 }
