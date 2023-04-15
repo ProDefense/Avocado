@@ -1,29 +1,48 @@
-# Avocado :avocado:
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/70419560/226087624-a4c6a4b6-11fc-4195-9878-cb19b6089b66.png">
+    <img alt="Shows different variants of the logo in dark and light mode." src="https://user-images.githubusercontent.com/70419560/226087634-67c086ce-2ea6-422a-b3a2-ade3822de914.png">
+  </picture>
+  Avocado C2
+</h1>
 
-Avocado is currently in development. Expect bugs
+<p align="center">
+  Avocado is a C2 framework currently in development. Expect bugs.
+  <br>
 
-## Running Avocado for development
+  <!-- Open github issues -->
+  <a href="https://github.com/ProDefense/Avocado/issues?q=is%3Aissue+is%3Aopen+">
+    <img src="https://img.shields.io/github/issues-raw/prodefense/avocado?color=f38ba8&style=for-the-badge">
+  </a>
 
-1. Build and run docker container
+  <!-- Closed github issues -->
+  <a href="https://github.com/ProDefense/Avocado/issues?q=is%3Aissue+is%3Aclosed">
+    <img src="https://img.shields.io/github/issues-closed-raw/prodefense/avocado?color=a6e3a1&style=for-the-badge">
+  </a>
+
+  <!-- License -->
+  <img src="https://img.shields.io/github/license/prodefense/avocado?color=b4befe&style=for-the-badge">
+
+  ![demo](assets/avocado.gif)
+</p>
+
+## Quick Start
+
+Avocado currently only supports a Docker installation.
+1. **Build and run docker container**
 ```
 $ docker build . -t avocado
 $ docker run --rm --name avocado -it avocado
 ```
 
-2. Inside the container, generate mTLS certs (these certs are ONLY to be used in development)
-```
-avocado$ cd src/certs
-avocado$ ./mkcerts.sh
-```
-
-3. Inside the container, run the server
+2. **Inside the container, run the server**
 ```
 avocado$ cd src/server
 avocado$ ./main.py
 ```
 
-4. Inside the container, compile and run the implant.
+3. **Inside the container, compile and run the implant.**
 ```
-avocado$ cd src/implant
-avocado$ cargo run
+> generate
 ```
+The implant will be output into the current working directory.

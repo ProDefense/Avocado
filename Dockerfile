@@ -1,11 +1,10 @@
 FROM --platform=linux/amd64 archlinux
 
 # WARNING: This docker file is used for testing only.
-# For an actual deployment, see the installation guide in the README
 
-RUN pacman -Syu --noconfirm && \
-    pacman -S base-devel rust python python-pip protobuf mkcert --noconfirm && \
-    useradd -M avocado
+RUN \
+  pacman -Sy base-devel rustup python python-pip protobuf mkcert mingw-w64-gcc musl --noconfirm && \
+  useradd -M avocado
 
 # Running an ubuntu docker container
 #FROM --platform=linux/amd64 ubuntu:latest
@@ -26,6 +25,18 @@ RUN chown -R avocado:avocado /home/avocado
 WORKDIR /home/avocado
 USER avocado
 
+<<<<<<< HEAD
 RUN pip install -r requirements.txt
+=======
+RUN \
+  pip install -r requirements.txt && \
+  rustup default nightly && \
+  rustup target add x86_64-unknown-linux-musl && \
+  rustup target add x86_64-pc-windows-gnu && \
+  rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu && \
+  cargo check --release --target=x86_64-pc-windows-gnu --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked windows" && \
+  cargo check --release --target=x86_64-unknown-linux-musl --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked linux" && \
+  echo "alias ls='ls --color'" >> $HOME/.bashrc
+>>>>>>> origin
 
 CMD [ "/bin/bash" ]
