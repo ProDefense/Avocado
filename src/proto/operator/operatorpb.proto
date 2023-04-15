@@ -14,8 +14,10 @@ message Message {
     RegistrationConfirmation = 2;
     ServerCmd = 3;
     ServerCmdOutput = 4;
-    SessionInfo = 5;
-    SessionConnected = 6;
+    SessionCmd = 5;
+    SessionCmdOutput = 6;
+    SessionInfo = 7;
+    SessionConnected = 8;
   }
   MessageType message_type = 1;
   bytes data = 2;
@@ -51,6 +53,18 @@ message ServerCmd {
 // Output from server
 message ServerCmdOutput {
   string cmdOutput = 1;
+}
+
+// Command to send to session
+message SessionCmd {
+  string cmd = 1;
+  string id = 2;
+}
+
+// Output from session
+message SessionCmdOutput {
+  string cmdOutput = 1;
+  string id = 2;
 }
 
 // Information about a session

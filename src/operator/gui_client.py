@@ -130,8 +130,9 @@ class MainApp(QMainWindow, Ui_MainWindow):
         implantq = Queue()
         sessionq = Queue()
         outputq = Queue()
+        session_outputq = Queue()
 
-        listener = Listener(hostname, port, outputq, implantq, sessionq)
+        listener = Listener(hostname, port, outputq, session_outputq, implantq, sessionq)
 
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
@@ -148,7 +149,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         layout = QVBoxLayout()
 
         # add active session and remote machines table to one widget
-        tabwidget = TabWidget(listener,outputq,sessionq)
+        tabwidget = TabWidget(listener,outputq,session_outputq,sessionq)
         self.remote_machines = RemoteMachines(tabwidget)
 
         layout.addWidget(self.remote_machines)

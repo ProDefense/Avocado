@@ -8,13 +8,15 @@ from gui.views.active_session import Ui_Active_Session
 from pb import operatorpb_pb2
 
 class TabWidget(QDialog):
-    def __init__(self, listener,outputq,sessionq):
+    def __init__(self, listener, outputq, session_outputq, sessionq):
         super().__init__()
 
+        self.tab_id = {}
         self.listener = listener
         self.outputq = outputq
+        #self.session_outputq = session_outputq
         self.sessionq = sessionq
-        threading.Thread(target=self.sessionHandler, args=(outputq,sessionq,)).start()
+        #threading.Thread(target=self.sessionHandler, args=(sessionq,)).start()
 
         self.tabwidget = QTabWidget()
 
@@ -22,12 +24,19 @@ class TabWidget(QDialog):
         vbox.addWidget(self.tabwidget)
         self.setLayout(vbox)
 
+    #    threading.Thread(target=self.outputHandler, args=(outputq,)).start()
+        threading.Thread(target=self.sessionOutputHandler, args=(session_outputq,)).start()
+
     def newTab(self, id, user, os):
         self.listener.send(f"use {id}")
-        self.tab = self.tabwidget.addTab(ActiveSession(self.listener,self.outputq,self.sessionq, self.tabwidget,f"{user}/{os}"), f"{user}/{os}")
 
+        tab = self.tabwidget.addTab(ActiveSession(self.listener, id, self.tab_id, self.tabwidget,f"{user}/{os}"), f"{user}/{os}")
+
+        self.tab_id[id] = tab
+
+    '''
     # handle new session connections
-    def sessionHandler(self, outputq, sessionq):
+    def sessionHandler(self, sessionq):
         while True:
             new_session = sessionq.get()
 
@@ -37,11 +46,45 @@ class TabWidget(QDialog):
             else:
                 break
 
+    # prints output messages received from the server
+    def outputHandler(self, outputq):
+        while True:
+            #output, id = outputq.get()
+            output = outputq.get()
+
+            if not output:
+                break
+
+            else:
+                #self.guiPrint(output)
+                pass
+    '''
+
+    # prints output messages received from the server
+    def sessionOutputHandler(self, session_outputq):
+        while True:
+            output, id = session_outputq.get()
+
+            if not output:
+                continue
+
+            else:
+                tab = self.tab_id[id]
+
+                self.tabwidget.widget(tab).terminalOutput.appendPlainText(output)
+                self.tabwidget.widget(tab).terminalOutput.verticalScrollBar().setValue(self.tabwidget.widget(tab).terminalOutput.verticalScrollBar().maximum())
+
+    def guiPrint(self, text):
+        self.terminalOutput.appendPlainText(text)
+        self.terminalOutput.verticalScrollBar().setValue(self.terminalOutput.verticalScrollBar().maximum())
+
 
 class ActiveSession(QWidget, Ui_Active_Session):
-    def __init__(self, listener, outputq, sessionq, tabwidget, title, parent=None):
+    def __init__(self, listener, id, tab_id, tabwidget, title, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.id = id
+        self.tab_id = tab_id
 
 
         self.machineName.setText(title)
@@ -52,43 +95,16 @@ class ActiveSession(QWidget, Ui_Active_Session):
         self.listener = listener
         self.tabwidget = tabwidget
 
-        self.stop_thread = False
-
-        self.thread = threading.Thread(target=self.outputHandler, args=(outputq,))
-        self.thread.start()
-
-
-
-    # prints output messages received from the server
-    def outputHandler(self, outputq):
-        while not self.stop_thread:
-            output = outputq.get()
-
-            if not output:
-                break
-
-            else:
-                self.guiPrint(output)
-
-    def guiPrint(self, text):
-        self.terminalOutput.appendPlainText(text)
-        self.terminalOutput.verticalScrollBar().setValue(self.terminalOutput.verticalScrollBar().maximum())
-
-
 
     def inputHandler(self):
         msg = self.terminalInput.text()
         self.terminalInput.clear()
-        self.listener.send(msg)
+        self.listener.sendSession(msg, self.id)
 
         if msg.lower() == "exit":
-            self.stop_thread = True
-
             index = self.tabwidget.indexOf(self)
             self.tabwidget.removeTab(index)
-
-            self.listener.send("---") # workaround to ensure the output thread is closed
-
+            del self.tab_id[self.id]
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("gui/resources/stylesheets/activeSessionStyleSheet.css", "r")
