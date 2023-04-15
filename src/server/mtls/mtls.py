@@ -7,7 +7,7 @@ import threading
 import urllib
 import uuid
 import sys
-from certs.certs import Certs
+from certs.certs import cert_generator
 from pb import implantpb_pb2
 from queue import Queue
 from typing import Tuple
@@ -49,11 +49,14 @@ class Listener:
         self.host, self.port = self._parse_endpoint(endpoint)
         self.sessions = Sessions()
         # Automatically generate CA certificates for the server
-        self.certs = Certs("server", client=False)
+        self.Server_Certificate_Generator = cert_generator('server', client=False) #This 'server' is the hostname for the cert
+        self.server_cert, self.server_key = self.Server_Certificate_Generator.build_x509_cert()
 
         # Create an initial set of client certs
-        self.client_certs = Certs("implant", client=True)
-        ctx = self._mtls_cfg(self.client_certs)
+        #self.Client_Certificate_Generator = cert_generator('implant', client=True)
+        #self.implant_cert, self. implant_key = self.Client_Certificate_Generator.build_x509_cert()
+
+        ctx = self._mtls_cfg()
         self.ssock = self._mkssock(ctx)
 
         # start accepting connections
@@ -70,12 +73,12 @@ class Listener:
 
         return result.hostname, result.port
 
-    def _mtls_cfg(self, client_certs: Certs) -> ssl.SSLContext:
+    def _mtls_cfg(self) -> ssl.SSLContext:
         # mTLS settings
         ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         ctx.verify_mode = ssl.CERT_REQUIRED
-        ctx.load_cert_chain(certfile=self.certs.public_key, keyfile=self.certs.private_key)
-        ctx.load_verify_locations(cafile=client_certs.rootCA)
+        ctx.load_cert_chain(certfile=self.server_cert, keyfile=self.server_key)
+        ctx.load_verify_locations(cafile=self.Server_Certificate_Generator.CA_Path)
         return ctx
 
     # Create a secure socket
