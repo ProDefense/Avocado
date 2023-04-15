@@ -6,7 +6,7 @@ import ast
 import threading
 from queue import Queue
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout
 from PyQt6.QtGui import QIcon, QAction
 
 from gui.active_session_logic import TabWidget
@@ -17,6 +17,8 @@ from gui.connect_screen_logic import ConnectScreen
 from gui.views.main_window import Ui_MainWindow
 
 from listener.listener import Listener
+from src.operator.gui.event_viewer_logic import EventViewer
+
 
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
@@ -44,11 +46,23 @@ class MainApp(QMainWindow, Ui_MainWindow):
         layout = QVBoxLayout()
 
         # add active session and remote machines table to one widget
-        tabwidget = TabWidget(self.listener,session_outputq)
+        tabwidget = TabWidget(self.listener, session_outputq)
         self.remote_machines = RemoteMachines(tabwidget)
+        self.event_viewer = EventViewer()
+        # layout.addWidget(self.event_viewer)
 
-        layout.addWidget(self.remote_machines)
+        hlay = QHBoxLayout()
+        hlay.addWidget(self.remote_machines)
+        hlay.addWidget(self.event_viewer)
+
+        hWidget = QWidget()
+        hWidget.setLayout(hlay)
+
+        # Here, add a horizontal widget
+        layout.addWidget(hWidget)
+
         layout.addWidget(tabwidget)
+
         # widget holds layout
         widget = QWidget()
         widget.setLayout(layout)
