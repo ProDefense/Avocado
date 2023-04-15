@@ -50,7 +50,7 @@ fn load_key(client_key: &str) -> Result<rustls::PrivateKey> {
 
     let mut client_key = BufReader::new(client_key.data.as_ref());
     match rustls_pemfile::read_one(&mut client_key)? {
-        Some(rustls_pemfile::Item::PKCS8Key(key)) => Ok(rustls::PrivateKey(key)),
+        Some(rustls_pemfile::Item::RSAKey(key)) => Ok(rustls::PrivateKey(key)),
         _ => Err(anyhow!("Invalid key")),
     }
 }

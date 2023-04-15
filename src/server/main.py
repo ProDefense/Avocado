@@ -5,7 +5,7 @@ from mtls import mtls
 from generate.generate import generate
 from queue import Queue
 from handler.handler import Handler
-
+import traceback
 
 def main():
     requestq = Queue()
@@ -16,6 +16,7 @@ def main():
         listener = mtls.Listener(requestq, endpoint)
     except Exception as e:
         print(e)
+        traceback.print_exc()
         exit(1)
 
     while True:
@@ -51,7 +52,7 @@ def main():
                 continue
 
             print("Generating the implant...")
-            generate(listener.client_certs, userin[1], userin[2])
+            generate(userin[1], userin[2])
 
 
 if __name__ == "__main__":
