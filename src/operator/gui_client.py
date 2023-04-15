@@ -11,24 +11,12 @@ from PyQt6.QtGui import QIcon, QAction
 
 from gui.active_session_logic import TabWidget
 from gui.remote_machines_logic import RemoteMachines
+from gui.connect_screen_logic import ConnectScreen
+
 
 from gui.views.main_window import Ui_MainWindow
-from gui.views.connect_screen import Ui_ConnectScreen
 
 from listener.listener import Listener
-
-
-# Screen for connecting to C2 Server
-class ConnectScreen(QMainWindow, Ui_ConnectScreen):
-    def __init__(self):
-        super().__init__()
-        self.setupUi(self)
-        self.connectScreenStyleSheet = self.loadStyleSheet()
-        self.setStyleSheet(self.connectScreenStyleSheet)
-
-    def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("gui/resources/stylesheets/connectScreen.css", "r")
-        return remoteMachinesStyleSheet.read()
 
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
