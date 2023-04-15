@@ -4,10 +4,19 @@ from pb import operatorpb_pb2
 
 class Listener:
     def __init__(self, hostname, port, session_outputq, implantq):
+        self.implantq = implantq
+        self.session_outputq = session_outputq
+        
         self._server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self._server.connect((hostname,port))
 
         threading.Thread(target=self._listen, args=(session_outputq, implantq)).start()
+
+    def terminate(self):
+        self.implantq.put(None)
+        self.session_outputq.put(None)
+        #self._server.close()
+        self._server.shutdown(socket.SHUT_RDWR)
 
     # convert message to protobuf and send to server
     def send(self, message):
@@ -47,7 +56,4 @@ class Listener:
                     session_outputq.put((session_output.cmdOutput, session_output.id))
 
             else:
-                implantq.put(None)
-                session_outputq.put(None)
-                self._server.close()
                 break

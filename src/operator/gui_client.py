@@ -2,11 +2,12 @@
 
 import os
 import sys
+import ast
 import threading
 from queue import Queue
 
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex, QCoreApplication
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QAbstractItemView, QHeaderView
 from PyQt6.QtGui import QIcon, QAction
 
@@ -31,7 +32,7 @@ class RemoteMachinesModel(QAbstractTableModel):
         return len(self.machines)
 
     def columnCount(self, parent=QModelIndex()):
-        return 5
+        return 6
 
     def data(self, index, role=DisplayRole):
         if not index.isValid():
@@ -58,14 +59,15 @@ class RemoteMachinesModel(QAbstractTableModel):
             return QtCore.QVariant()
         elif role != DisplayRole:
             return QtCore.QVariant()
-        return QtCore.QVariant(self.machines[index.row()][2])
+        return QtCore.QVariant(self.machines[index.row()][3])
 
     def getUser(self, index, role=DisplayRole):
         if not index.isValid():
             return QtCore.QVariant()
         elif role != DisplayRole:
             return QtCore.QVariant()
-        return QtCore.QVariant(self.machines[index.row()][4])
+        return QtCore.QVariant(self.machines[index.row()][5])
+
 class RemoteMachines(QWidget, Ui_RemoteMachines):
     def __init__(self, tabwidget):
         self.tabwidget = tabwidget
@@ -73,7 +75,7 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
         self.setupUi(self)
 
         self.implant_list: list = []
-        self.header = ["id", "addr", "os", "pid", "user"]
+        self.header = ["id", "host", "port", "os", "pid", "user"]
 
         self._remoteMachinesModel = RemoteMachinesModel(self.implant_list, self.header)
 
@@ -128,13 +130,13 @@ class MainApp(QMainWindow, Ui_MainWindow):
 
         implantq = Queue()
         session_outputq = Queue()
-        listener = Listener(hostname, port, session_outputq, implantq)
+        self.listener = Listener(hostname, port, session_outputq, implantq)
 
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
 
-        self.generateAction.triggered.connect(lambda: listener.send("generate"))
+        self.generateAction.triggered.connect(lambda: self.listener.send("generate"))
 
         # add connect button to Avocado menu bar
         openConnectScreen = QAction(self)
@@ -145,7 +147,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         layout = QVBoxLayout()
 
         # add active session and remote machines table to one widget
-        tabwidget = TabWidget(listener,session_outputq)
+        tabwidget = TabWidget(self.listener,session_outputq)
         self.remote_machines = RemoteMachines(tabwidget)
 
         layout.addWidget(self.remote_machines)
@@ -161,6 +163,10 @@ class MainApp(QMainWindow, Ui_MainWindow):
 
         threading.Thread(target=self.implantHandler, args=(implantq,)).start()
 
+    def closeEvent(self, event):
+        self.listener.terminate()
+        event.accept()
+
     # handle new implants
     def implantHandler(self,implantq):
         while True:
@@ -168,7 +174,8 @@ class MainApp(QMainWindow, Ui_MainWindow):
             if new_implant:
                 self.remote_machines.addImplant([
                     new_implant.id,
-                    new_implant.addr,
+                    ast.literal_eval(new_implant.addr)[0],
+                    ast.literal_eval(new_implant.addr)[1],
                     new_implant.os,
                     new_implant.pid,
                     new_implant.user.name])
