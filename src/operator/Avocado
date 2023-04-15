@@ -20,6 +20,7 @@ from listener.listener import Listener
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
+
         # set up connection w/ server
         hostname = "127.0.0.1"
         port = 12345
@@ -31,6 +32,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
+
 
         self.generateAction.triggered.connect(lambda: self.listener.send("generate"))
 
@@ -91,7 +93,9 @@ class MainApp(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("Avocado")
-    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "assets/avocadologo.png")
+
+    # set logo
+    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "assets/logo.png")
     app.setWindowIcon(QIcon(path))
 
     window = MainApp()
