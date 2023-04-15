@@ -13,7 +13,6 @@ from gui.active_session_logic import TabWidget
 from gui.remote_machines_logic import RemoteMachines
 from gui.connect_screen_logic import ConnectScreen
 
-
 from gui.views.main_window import Ui_MainWindow
 
 from listener.listener import Listener

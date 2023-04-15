@@ -5,24 +5,24 @@ from pb import operatorpb_pb2, implantpb_pb2
 from sqlalchemy import create_engine, engine, insert
 
 class Handler:
-    def __init__(self, requestq: Queue, clients: dict):
+    def __init__(self, requestq: Queue, operators: dict):
         self._requestq = requestq
-        self._clients = clients
+        self._operators = operators
         self._implants = list() # implant is a pair of a registration and id
 
-    # Brodcast all current implant registrations to a new client
-    def brodcastImplants(self, client):
+    # Brodcast all current implant registrations to a new operator
+    def brodcastImplants(self, operator):
         for implant in self._implants:
-            self._brodcast_implant(implant, [client])
+            self._brodcast_implant(implant, [operator])
 
-    # Brodcast new implant registration to all clients
-    def _brodcast_implant(self, implant, clients):
+    # Brodcast new implant registration to all operators
+    def _brodcast_implant(self, implant, operators):
         registration, id = implant
 
         # converts the groups from implantpb groups to operatorpb groups
         user_groups = [operatorpb_pb2.SessionInfo.User(id=group.id, name=group.name) for group in registration.groups]
 
-        # brodcast new session information to all clients
+        # brodcast new session information to all operators
         session_info = operatorpb_pb2.Message(
             message_type=operatorpb_pb2.Message.MessageType.SessionInfo,
             data=operatorpb_pb2.SessionInfo(
@@ -38,7 +38,7 @@ class Handler:
                 ).SerializeToString()
         ).SerializeToString()
 
-        for c in clients:
+        for c in operators:
             c.send(session_info)
         
 
@@ -85,4 +85,4 @@ class Handler:
 
             new_implant = (registration,id)
             self._implants.append(new_implant)
-            self._brodcast_implant(new_implant, self._clients)
+            self._brodcast_implant(new_implant, self._operators)

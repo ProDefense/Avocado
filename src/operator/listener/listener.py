@@ -15,7 +15,6 @@ class Listener:
     def terminate(self):
         self.implantq.put(None)
         self.session_outputq.put(None)
-        #self._server.close()
         self._server.shutdown(socket.SHUT_RDWR)
 
     # convert message to protobuf and send to server

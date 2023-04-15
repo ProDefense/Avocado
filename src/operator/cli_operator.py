@@ -3,7 +3,7 @@ import threading
 from listener.listener import Listener
 from queue import Queue
 
-class Client:
+class Operator:
     sessions = []
 
     def __init__(self):
@@ -93,4 +93,4 @@ class Client:
 
 
 if __name__ == "__main__":
-    Client()
+    Operator()
