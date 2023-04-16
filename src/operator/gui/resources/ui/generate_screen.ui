@@ -51,21 +51,21 @@
    </property>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <widget class="QTextEdit" name="Port">
+     <widget class="QTextEdit" name="Host">
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>130</y>
+        <y>70</y>
         <width>341</width>
         <height>41</height>
        </rect>
       </property>
      </widget>
-     <widget class="QTextEdit" name="Host">
+     <widget class="QTextEdit" name="Port">
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>60</y>
+        <y>130</y>
         <width>341</width>
         <height>41</height>
        </rect>
