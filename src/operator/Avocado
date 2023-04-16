@@ -13,6 +13,7 @@ from PyQt6.uic.properties import QtGui
 from gui.active_session_logic import TabWidget
 from gui.remote_machines_logic import RemoteMachines
 from gui.connect_screen_logic import ConnectScreen
+from gui.generate_screen_logic import GenerateScreen
 from gui.event_viewer_logic import EventViewer
 
 from gui.views.main_window import Ui_MainWindow
@@ -31,16 +32,16 @@ class MainApp(QMainWindow, Ui_MainWindow):
         hostname, port = None, None
 
         # Must put in hostname / port
-        self.w = ConnectScreen()
-        self.w.exec()
+        self.connect_screen = ConnectScreen()
+        self.connect_screen.exec()
 
         # set up connection w/ server
         # test these values
         # hostname = "127.0.0.1"
         # port = 12345
 
-        hostname = self.w.hostname_text
-        port = int(self.w.port_text)
+        hostname = self.connect_screen.hostname_text
+        port = int(self.connect_screen.port_text)
 
         implantq = Queue()
         session_outputq = Queue()
@@ -48,15 +49,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         # if hostname is not None and port is not None:
         self.listener = Listener(hostname, port, session_outputq, implantq)
 
-
-        self.generateAction.triggered.connect(lambda: self.listener.send("generate"))
-
-        # add connect button to Avocado menu bar
-        openConnectScreen = QAction(self)
-        openConnectScreen.setText("Connect")
-        openConnectScreen.triggered.connect(self.connectScreen)
-
-        self.menuAvocado.addAction(openConnectScreen)
+        self.generateAction.triggered.connect(self.generateScreen)
 
         layout = QVBoxLayout()
 
@@ -110,9 +103,9 @@ class MainApp(QMainWindow, Ui_MainWindow):
             else:
                 break
 
-    def connectScreen(self):
-        self.w = ConnectScreen()
-        self.w.show()
+    def generateScreen(self):
+        self.generate_screen = GenerateScreen()
+        self.generate_screen.show()
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("gui/resources/stylesheets/mainWindowStyleSheet.css", "r")
