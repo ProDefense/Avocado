@@ -41,6 +41,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         openConnectScreen = QAction(self)
         openConnectScreen.setText("Connect")
         openConnectScreen.triggered.connect(self.connectScreen)
+
         self.menuAvocado.addAction(openConnectScreen)
 
         layout = QVBoxLayout()
