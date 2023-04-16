@@ -2,7 +2,7 @@ from queue import Queue
 
 from PyQt6.QtWidgets import QWidget
 
-from src.operator.gui.views.event_viewer import Ui_EventViewer
+from gui.views.event_viewer import Ui_EventViewer
 
 
 class EventViewer(QWidget, Ui_EventViewer):
