@@ -23,13 +23,10 @@ class GenerateScreen(QDialog, QWidget, Ui_GenerateScreen):
         port = self.Port.toPlainText()
         self.port_text = self.Port.toPlainText()
 
-        if (self.linuxBtn.isChecked):
+        if (self.linuxBtn.isChecked()):
             target_os = "linux"
-        elif (self.windowsBtn.isChecked):
+        elif (self.windowsBtn.isChecked()):
             target_os = "windows"
-
-        
-        endpoint = host + ":" + port
 
         generate(endpoint, target_os)
         self.close()

@@ -123,7 +123,7 @@
        <string>Host</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="windownBtn">
+     <widget class="QRadioButton" name="windowsBtn">
       <property name="geometry">
        <rect>
         <x>320</x>
