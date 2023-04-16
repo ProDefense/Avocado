@@ -12,11 +12,11 @@ from PyQt6.QtGui import QIcon, QAction
 from gui.active_session_logic import TabWidget
 from gui.remote_machines_logic import RemoteMachines
 from gui.connect_screen_logic import ConnectScreen
+from gui.event_viewer_logic import EventViewer
 
 from gui.views.main_window import Ui_MainWindow
 
 from listener.listener import Listener
-from src.operator.gui.event_viewer_logic import EventViewer
 
 
 # Main app that connects widgets into one window
