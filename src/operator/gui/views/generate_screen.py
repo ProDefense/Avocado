@@ -32,7 +32,7 @@ class Ui_GenerateScreen(object):
         self.Host.setGeometry(QtCore.QRect(150, 60, 341, 41))
         self.Host.setObjectName("Host")
         self.genBtn = QtWidgets.QPushButton(self.widget)
-        self.genBtn.setGeometry(QtCore.QRect(200, 270, 201, 51))
+        self.genBtn.setGeometry(QtCore.QRect(200, 250, 201, 51))
         self.genBtn.setObjectName("genBtn")
         self.label = QtWidgets.QLabel(self.widget)
         self.label.setGeometry(QtCore.QRect(70, 140, 58, 16))
@@ -49,6 +49,12 @@ class Ui_GenerateScreen(object):
         self.linuxBtn = QtWidgets.QRadioButton(self.widget)
         self.linuxBtn.setGeometry(QtCore.QRect(190, 210, 121, 20))
         self.linuxBtn.setObjectName("linuxBtn")
+        self.progressBar = QtWidgets.QProgressBar(self.widget)
+        self.progressBar.setGeometry(QtCore.QRect(240, 310, 118, 23))
+        self.progressBar.setMaximum(0)
+        self.progressBar.setProperty("value", -1)
+        self.progressBar.setTextVisible(False)
+        self.progressBar.setObjectName("progressBar")
         self.horizontalLayout.addWidget(self.widget)
 
         self.retranslateUi(GenerateScreen)
@@ -56,7 +62,7 @@ class Ui_GenerateScreen(object):
 
     def retranslateUi(self, GenerateScreen):
         _translate = QtCore.QCoreApplication.translate
-        GenerateScreen.setWindowTitle(_translate("GenerateScreen", "Connect"))
+        GenerateScreen.setWindowTitle(_translate("GenerateScreen", "Generate"))
         self.genBtn.setText(_translate("GenerateScreen", "Generate"))
         self.label.setText(_translate("GenerateScreen", "Port"))
         self.label_2.setText(_translate("GenerateScreen", "OS"))
