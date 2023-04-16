@@ -43,7 +43,7 @@ avocado$ ./main.py
 
 4. **On another terminal, run the the operator (only CLI operator is supported via Docker)**
 ```
-$ docker exec -it avocado src/avocado-cli
+$ docker exec -it avocado src/avocado-operator-cli
 ```
 
 5. **Using the operator, compile and run the implant.**
