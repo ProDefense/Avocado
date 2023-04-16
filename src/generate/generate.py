@@ -26,7 +26,7 @@ class Profile:
 
     # Run cargo build.
     def generate(self):
-        exit_code = self._cargo_build(os.path.join("implant", "Cargo.toml"))
+        exit_code = self._cargo_build(os.path.join("avocado", "Cargo.toml"))
         if exit_code != 0 and exit_code != 1:
             exit_code = self._cargo_build(os.path.join(AVOCADO_ROOT, "implant", "Cargo.toml"))
         if exit_code != 0 and exit_code != 1:
