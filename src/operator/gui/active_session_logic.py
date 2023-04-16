@@ -13,6 +13,7 @@ class TabWidget(QDialog):
         self.tab_id = {}
         self.listener = listener
 
+
         self.tabwidget = QTabWidget()
         self.tabwidget.setTabsClosable(True)
 

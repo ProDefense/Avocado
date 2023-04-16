@@ -1,3 +1,5 @@
+from queue import Queue
+
 from PyQt6.QtWidgets import QWidget
 
 from src.operator.gui.views.event_viewer import Ui_EventViewer
@@ -6,7 +8,6 @@ from src.operator.gui.views.event_viewer import Ui_EventViewer
 class EventViewer(QWidget, Ui_EventViewer):
 
     def __init__(self):
-        # self.tabwidget = tabwidget
         super(EventViewer, self).__init__()
         self.setupUi(self)
 
