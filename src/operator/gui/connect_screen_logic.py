@@ -7,10 +7,6 @@ class ConnectScreen(QDialog, QWidget, Ui_ConnectScreen):
         super().__init__()
         self.setupUi(self)
 
-        self.hostname = None
-        self.name = None
-        self.port = None
-
         self.connectScreenStyleSheet = self.loadStyleSheet()
         self.setStyleSheet(self.connectScreenStyleSheet)
 
@@ -23,7 +19,6 @@ class ConnectScreen(QDialog, QWidget, Ui_ConnectScreen):
     def saveServerInfo(self):
         # get the text from each QTextEdit and save it to a variable
         self.hostname_text = self.Host.toPlainText()
-        self.name_text = self.Name.toPlainText()
         self.port_text = self.Port.toPlainText()
         self.close()
 

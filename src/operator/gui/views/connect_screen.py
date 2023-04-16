@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'resources/ui/connect_screen.ui'
+# Form implementation generated from reading ui file 'gui/resources/ui/connect_screen.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.0
 #
@@ -26,26 +26,20 @@ class Ui_ConnectScreen(object):
         self.widget = QtWidgets.QWidget(ConnectScreen)
         self.widget.setObjectName("widget")
         self.Host = QtWidgets.QTextEdit(self.widget)
-        self.Host.setGeometry(QtCore.QRect(150, 130, 341, 41))
+        self.Host.setGeometry(QtCore.QRect(150, 80, 341, 41))
         self.Host.setObjectName("Host")
-        self.Name = QtWidgets.QTextEdit(self.widget)
-        self.Name.setGeometry(QtCore.QRect(150, 60, 341, 41))
-        self.Name.setObjectName("Name")
         self.Port = QtWidgets.QTextEdit(self.widget)
-        self.Port.setGeometry(QtCore.QRect(150, 200, 341, 41))
+        self.Port.setGeometry(QtCore.QRect(150, 150, 341, 41))
         self.Port.setObjectName("Port")
         self.connectButton = QtWidgets.QPushButton(self.widget)
-        self.connectButton.setGeometry(QtCore.QRect(200, 270, 201, 51))
+        self.connectButton.setGeometry(QtCore.QRect(200, 220, 201, 51))
         self.connectButton.setObjectName("connectButton")
         self.label = QtWidgets.QLabel(self.widget)
-        self.label.setGeometry(QtCore.QRect(70, 140, 58, 16))
+        self.label.setGeometry(QtCore.QRect(70, 90, 58, 16))
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.widget)
-        self.label_2.setGeometry(QtCore.QRect(70, 210, 58, 16))
+        self.label_2.setGeometry(QtCore.QRect(70, 160, 58, 16))
         self.label_2.setObjectName("label_2")
-        self.label_3 = QtWidgets.QLabel(self.widget)
-        self.label_3.setGeometry(QtCore.QRect(70, 70, 58, 16))
-        self.label_3.setObjectName("label_3")
         self.horizontalLayout.addWidget(self.widget)
 
         self.retranslateUi(ConnectScreen)
@@ -57,4 +51,3 @@ class Ui_ConnectScreen(object):
         self.connectButton.setText(_translate("ConnectScreen", "Connect"))
         self.label.setText(_translate("ConnectScreen", "Host"))
         self.label_2.setText(_translate("ConnectScreen", "Port"))
-        self.label_3.setText(_translate("ConnectScreen", "Name"))
