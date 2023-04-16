@@ -8,3 +8,7 @@ QPushButton {
 QMenuBar {
     color: "white";
 }
+
+QMenuBar::item {
+    color: "white"; 
+}
