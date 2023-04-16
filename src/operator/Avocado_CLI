@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import threading
 from listener.listener import Listener
+from generate.generate import generate
 from queue import Queue
 
 class Operator:
@@ -73,11 +74,13 @@ class Operator:
                     if len(command) != 3 or (command[2] != "linux" and command[2] != "windows"):
                         print("Usage: generate <endpoint> linux|windows")
                     else:
-                        listener.sendGenerate(command[1], command[2])
+                        print("Generating the implant...")
+
+                        generate(command[1], command[2])
 
                 elif command[0] == "use":
                     if command[1] not in self.sessions:
-                        print (b"Session doesn't exist")
+                        print(b"Session doesn't exist")
 
                     if len(command) == 2:
                         self.inputHandler(listener, output_received, command[1], command[1]) 
