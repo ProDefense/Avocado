@@ -5,3 +5,6 @@ QPushButton {
     font-size: 16px;
     background-color: "darkblue"
 }
+QMenuBar {
+    color: "white";
+}
