@@ -57,4 +57,4 @@ $ docker cp avocado:src/implant .
 ```
 
 ## GUI Operator Instructions
-Only manual installation is supported for the GUI operator. See [https://github.com/ProDefense/Avocado/blob/src/client/README.md](operator README) for more instructions.
+Only manual installation is supported for the GUI operator. See [operator README](client/README.md) for more instructions.
