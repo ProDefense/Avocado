@@ -49,7 +49,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.event_viewer = EventViewer()
         self.event_viewer.logToEventViewer(f"Connected to server {hostname}:{port} ")
 
-        tabwidget = TabWidget(self.listener, session_outputq)
+        tabwidget = TabWidget(self.listener, session_outputq, self.event_viewer)
         self.remote_machines = RemoteMachines(tabwidget, self.event_viewer)
 
         hlay = QHBoxLayout()
