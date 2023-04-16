@@ -9,6 +9,14 @@ QMenuBar {
     color: "white";
 }
 
+QMenu {
+    color: "white";
+}
+
 QMenuBar::item {
+    color: "white"; 
+}
+
+QMenuBar::item::selected {
     color: "white"; 
 }
