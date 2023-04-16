@@ -1,34 +1,27 @@
 # operator
-
 This contains code for the C2 operator.
 
 There are CLI and GUI versions of the operator.
 
-## UI under construction
+## GUI 
+The GUI requires pyqt. 
 
-The GUI requires pyqt
 Installation:
 ```angular2html
-$ pip install -r requirements.txt
+$ pip install -r gui-requirements.txt
 ```
 
-Using the tool pyuic6 to convert *.ui xml files generated in QtCreator into python code.
+## Implant Generation
+Rust is needed to generate implants. 
+
+Generation Dependencies:
+- rustup
+- musl-gcc
+
+## GUI Development
+Use the tool pyuic6 to convert *.ui xml files generated in QtCreator into python code.
 
 Usage:
 ```angular2html
 $ pyuic6 gui/resources/ui/main_window.ui > gui/views/main_window.py
 ```
-
-## Protocol Buffers
-Compile the protocol buffers into python code with this:
-```
-$ protoc -I ../proto/implant/ --python_out=./pb ../proto/implant/implantpb.proto
-$ protoc -I ../proto/operator/ --python_out=./pb ../proto/operator/operatorpb.proto
-```
-
-## Implant Generation
-Rust is needed to generate implants. Implant generation was only tested on linux.
-
-Generation Dependencies:
-- rustup
-- musl-gcc
