@@ -1,26 +1,19 @@
 #!/usr/bin/env python3
-
 import os
 import sys
 import ast
 import threading
 from queue import Queue
-
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout
 from PyQt6.QtGui import QIcon, QAction
 from PyQt6.uic.properties import QtGui
-
-from gui.active_session_logic import TabWidget
-from gui.remote_machines_logic import RemoteMachines
-from gui.connect_screen_logic import ConnectScreen
-from gui.generate_screen_logic import GenerateScreen
-from gui.event_viewer_logic import EventViewer
-
-from gui.views.main_window import Ui_MainWindow
-
-from listener.listener import Listener
-
-
+from client.gui.active_session_logic import TabWidget
+from client.gui.remote_machines_logic import RemoteMachines
+from client.gui.connect_screen_logic import ConnectScreen
+from client.gui.generate_screen_logic import GenerateScreen
+from client.gui.event_viewer_logic import EventViewer
+from client.gui.views.main_window import Ui_MainWindow
+from client.listener.listener import Listener
 
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
@@ -108,7 +101,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.generate_screen.show()
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("gui/resources/stylesheets/mainWindowStyleSheet.css", "r")
+        remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/mainWindowStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
 
 

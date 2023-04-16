@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtWidgets
-from gui.views.remote_machines import Ui_RemoteMachines
+from client.gui.views.remote_machines import Ui_RemoteMachines
 from PyQt6.QtCore import QAbstractTableModel, QModelIndex, Qt
 from PyQt6.QtWidgets import QWidget, QAbstractItemView, QHeaderView
 
@@ -87,7 +87,7 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
 
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("gui/resources/stylesheets/remoteMachineStyleSheet.css", "r")
+        remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/remoteMachineStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
 
     def addImplant(self, new_implant):

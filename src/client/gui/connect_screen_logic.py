@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QDialog
-from gui.views.connect_screen import Ui_ConnectScreen
+from client.gui.views.connect_screen import Ui_ConnectScreen
 
 # Screen for connecting to C2 Server
 class ConnectScreen(QDialog, QWidget, Ui_ConnectScreen):
@@ -13,7 +13,7 @@ class ConnectScreen(QDialog, QWidget, Ui_ConnectScreen):
         self.connectButton.clicked.connect(self.saveServerInfo)
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("gui/resources/stylesheets/connectScreen.css", "r")
+        remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/connectScreen.css", "r")
         return remoteMachinesStyleSheet.read()
 
     def saveServerInfo(self):

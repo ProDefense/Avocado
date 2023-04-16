@@ -2,7 +2,7 @@ import sys
 import threading
 
 from PyQt6.QtWidgets import QApplication, QWidget, QTabWidget, QVBoxLayout, QDialog
-from gui.views.active_session import Ui_Active_Session
+from client.gui.views.active_session import Ui_Active_Session
 from PyQt6.QtCore import QTimer
 
 
@@ -89,7 +89,7 @@ class ActiveSession(QWidget, Ui_Active_Session):
             del self.tab_id[self.id]
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("gui/resources/stylesheets/activeSessionStyleSheet.css", "r")
+        remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/activeSessionStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
 
 

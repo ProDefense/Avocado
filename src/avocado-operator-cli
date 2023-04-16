@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 import threading
-from listener.listener import Listener
+from client.listener.listener import Listener
 from generate.generate import generate
 from queue import Queue
+from util.util import parseEndpoint
 
 class Operator:
     sessions = []
 
     def __init__(self):
-        # TODO prompt the user to enter host/port instead
-        hostname = "127.0.0.1"
-        port = 12345
+        hostname, port = parseEndpoint(input("Enter Server Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
 
         implantq = Queue()
         session_outputq = Queue()

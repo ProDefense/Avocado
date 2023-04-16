@@ -1,9 +1,6 @@
 from queue import Queue
-
 from PyQt6.QtWidgets import QWidget
-
-from gui.views.event_viewer import Ui_EventViewer
-
+from client.gui.views.event_viewer import Ui_EventViewer
 
 class EventViewer(QWidget, Ui_EventViewer):
 
@@ -16,7 +13,7 @@ class EventViewer(QWidget, Ui_EventViewer):
         self.handleTest()
 
     def loadStyleSheet(self):
-        eventStyleSheet = open("gui/resources/stylesheets/eventStyleSheet.css", "r")
+        eventStyleSheet = open("client/gui/resources/stylesheets/eventStyleSheet.css", "r")
         return eventStyleSheet.read()
 
     def handleTest(self):

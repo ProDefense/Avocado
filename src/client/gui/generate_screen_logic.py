@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QDialog
-from gui.views.generate_screen import Ui_GenerateScreen
+from client.gui.views.generate_screen import Ui_GenerateScreen
 from generate.generate import generate
 
 # Screen for generating an implant
@@ -14,7 +14,7 @@ class GenerateScreen(QDialog, QWidget, Ui_GenerateScreen):
         self.genBtn.clicked.connect(self.generate)
 
     def loadStyleSheet(self):
-        remoteMachinesStyleSheet = open("gui/resources/stylesheets/connectScreen.css", "r")
+        remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/connectScreen.css", "r")
         return remoteMachinesStyleSheet.read()
 
     def generate(self):
