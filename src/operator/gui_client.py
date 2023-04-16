@@ -8,6 +8,7 @@ from queue import Queue
 
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout
 from PyQt6.QtGui import QIcon, QAction
+from PyQt6.uic.properties import QtGui
 
 from gui.active_session_logic import TabWidget
 from gui.remote_machines_logic import RemoteMachines
@@ -20,20 +21,33 @@ from listener.listener import Listener
 from src.operator.gui.event_viewer_logic import EventViewer
 
 
+
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        # set up connection w/ server
-        hostname = "127.0.0.1"
-        port = 12345
-
-        implantq = Queue()
-        session_outputq = Queue()
-        self.listener = Listener(hostname, port, session_outputq, implantq)
-
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
+
+        hostname, port = None, None
+
+        # Must put in hostname / port
+        self.w = ConnectScreen()
+        self.w.exec()
+
+        # set up connection w/ server
+        # test these values
+        # hostname = "127.0.0.1"
+        # port = 12345
+
+        hostname = self.w.hostname_text
+        port = int(self.w.port_text)
+
+        implantq = Queue()
+        session_outputq = Queue()
+
+        # if hostname is not None and port is not None:
+        self.listener = Listener(hostname, port, session_outputq, implantq)
 
         self.generateAction.triggered.connect(lambda: self.listener.send("generate"))
 
