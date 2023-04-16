@@ -3,7 +3,7 @@ FROM --platform=linux/amd64 archlinux
 # WARNING: This docker file is used for testing only.
 
 RUN \
-  pacman -Sy base-devel rustup python python-pip protobuf mkcert mingw-w64-gcc musl --noconfirm && \
+  pacman -Sy base-devel rustup python python-pip protobuf mingw-w64-gcc musl --noconfirm && \
   useradd -M avocado
 
 # Running an ubuntu docker container
@@ -13,7 +13,6 @@ RUN \
 #    apt-get install -y protobuf-compiler && \
 #    curl --proto '=https' --tisv1.2 https://sh.rustup.rs -sSf | sh && \
 #    apt-get install -y python3.10 python3-pip && \
-#    apt-get install -y mkcert && \
 #    useradd -M avocado
 #
 #RUN pip install --upgrade pip && pip install PyQt6-sip==13.4.0
