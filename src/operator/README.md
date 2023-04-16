@@ -6,6 +6,12 @@ There are CLI and GUI versions of the operator.
 
 ## UI under construction
 
+The GUI requires pyqt
+Installation:
+```angular2html
+$ pip install -r requirements.txt
+```
+
 Using the tool pyuic6 to convert *.ui xml files generated in QtCreator into python code.
 
 Usage:
