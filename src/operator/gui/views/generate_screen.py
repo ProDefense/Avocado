@@ -41,7 +41,7 @@ class Ui_GenerateScreen(object):
         self.label_2.setGeometry(QtCore.QRect(70, 210, 58, 16))
         self.label_2.setObjectName("label_2")
         self.label_3 = QtWidgets.QLabel(self.widget)
-        self.label_3.setGeometry(QtCore.QRect(70, 70, 58, 16))
+        self.label_3.setGeometry(QtCore.QRect(70, 80, 58, 16))
         self.label_3.setObjectName("label_3")
         self.windownBtn = QtWidgets.QRadioButton(self.widget)
         self.windownBtn.setGeometry(QtCore.QRect(320, 210, 121, 20))
