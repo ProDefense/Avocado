@@ -7,11 +7,12 @@ from PyQt6.QtCore import QTimer
 
 
 class TabWidget(QDialog):
-    def __init__(self, listener, session_outputq):
+    def __init__(self, listener, session_outputq, event_viewer):
         super().__init__()
 
         self.tab_id = {}
         self.listener = listener
+        self.event_viewer = event_viewer
 
         self.tabwidget = QTabWidget()
         self.tabwidget.setTabsClosable(True)
@@ -30,6 +31,7 @@ class TabWidget(QDialog):
         del self.tab_id[widget.id]
         widget.deleteLater()
         self.tabwidget.removeTab(index)
+        self.event_viewer.logToEventViewer(f"Closing session with implant {id}")
 
     def onChange(self, index):
         if (index != -1):
