@@ -53,8 +53,12 @@ class RemoteMachinesModel(QAbstractTableModel):
         return QtCore.QVariant(self.machines[index.row()][5])
 
 class RemoteMachines(QWidget, Ui_RemoteMachines):
-    def __init__(self, tabwidget):
+    def __init__(self, tabwidget, event_viewer):
         self.tabwidget = tabwidget
+
+        # added for logging purposes
+        self.event_viewer = event_viewer
+
         super(RemoteMachines, self).__init__()
         self.setupUi(self)
 
@@ -79,6 +83,8 @@ class RemoteMachines(QWidget, Ui_RemoteMachines):
         user = self.implants.model().getUser(index).value()
         os = self.implants.model().getOs(index).value()
         self.tabwidget.newTab(id, user, os)
+        self.event_viewer.logToEventViewer(f"Connected to implant {id}")
+
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("gui/resources/stylesheets/remoteMachineStyleSheet.css", "r")
