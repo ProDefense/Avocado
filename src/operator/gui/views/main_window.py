@@ -28,8 +28,6 @@ class Ui_MainWindow(object):
         self.menubar.setDefaultUp(False)
         self.menubar.setNativeMenuBar(True)
         self.menubar.setObjectName("menubar")
-        self.menuAvocado = QtWidgets.QMenu(self.menubar)
-        self.menuAvocado.setObjectName("menuAvocado")
         self.menuImplant = QtWidgets.QMenu(self.menubar)
         self.menuImplant.setObjectName("menuImplant")
         MainWindow.setMenuBar(self.menubar)
@@ -55,7 +53,6 @@ class Ui_MainWindow(object):
         self.actionPlaceholder_5 = QtGui.QAction(MainWindow)
         self.actionPlaceholder_5.setObjectName("actionPlaceholder_5")
         self.menuImplant.addAction(self.generateAction)
-        self.menubar.addAction(self.menuAvocado.menuAction())
         self.menubar.addAction(self.menuImplant.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -64,7 +61,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Avocado 🥑"))
-        self.menuAvocado.setTitle(_translate("MainWindow", "Avocado"))
         self.menuImplant.setTitle(_translate("MainWindow", "Implant"))
         self.actionAbout.setText(_translate("MainWindow", "About Avocado"))
         self.actionPreferences.setText(_translate("MainWindow", "Preferences..."))

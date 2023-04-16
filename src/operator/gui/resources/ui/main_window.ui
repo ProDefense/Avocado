@@ -43,18 +43,12 @@ background-color:#16161D
    <property name="nativeMenuBar">
     <bool>true</bool>
    </property>
-   <widget class="QMenu" name="menuAvocado">
-    <property name="title">
-     <string>Avocado</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuImplant">
     <property name="title">
      <string>Implant</string>
     </property>
     <addaction name="generateAction"/>
    </widget>
-   <addaction name="menuAvocado"/>
    <addaction name="menuImplant"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
