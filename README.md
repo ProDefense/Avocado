@@ -56,5 +56,7 @@ The implant will be output into the current working directory. If you wish to co
 $ docker cp avocado:src/implant .
 ```
 
-## GUI Operator Instructions
+## GUI Operator
+![GUI Operator](assets/gui.png)
+
 Only manual installation is supported for the GUI operator. See [operator README](client/README.md) for more instructions.
