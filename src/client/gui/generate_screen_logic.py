@@ -28,5 +28,7 @@ class GenerateScreen(QDialog, QWidget, Ui_GenerateScreen):
         elif (self.windowsBtn.isChecked()):
             target_os = "windows"
 
+        endpoint = host + ":" + port
+
         generate(endpoint, target_os)
         self.close()
