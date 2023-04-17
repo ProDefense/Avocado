@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QDialog
 from client.gui.views.generate_screen import Ui_GenerateScreen
-from generate.generate import generate
+from client.generate.generate import generate
 
 # Screen for generating an implant
 class GenerateScreen(QDialog, QWidget, Ui_GenerateScreen):

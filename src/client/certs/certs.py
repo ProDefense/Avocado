@@ -7,7 +7,7 @@ from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
 import datetime
 import os
-from util.util import AVOCADO_ROOT
+from client.util.util import AVOCADO_ROOT
 
 class cert_generator(object):
     def __init__(self, name: str, client: bool):

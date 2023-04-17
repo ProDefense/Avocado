@@ -6,8 +6,8 @@ import ssl
 import threading
 import uuid
 import sys
-from certs.certs import cert_generator
-from pb import implantpb_pb2
+from client.certs.certs import cert_generator
+from client.pb import implantpb_pb2
 from queue import Queue
 
 

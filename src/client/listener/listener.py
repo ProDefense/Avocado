@@ -1,6 +1,6 @@
 import socket
 import threading
-from pb import operatorpb_pb2
+from client.pb import operatorpb_pb2
 
 class Listener:
     def __init__(self, hostname, port, session_outputq, implantq):

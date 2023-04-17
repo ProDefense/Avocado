@@ -1,7 +1,7 @@
 # Handle registrations from new implants
 import threading
 from queue import Queue
-from pb import operatorpb_pb2, implantpb_pb2
+from client.pb import operatorpb_pb2, implantpb_pb2
 
 class Handler:
     def __init__(self, requestq: Queue, operators: dict):

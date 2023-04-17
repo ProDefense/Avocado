@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import threading
 from client.listener.listener import Listener
-from generate.generate import generate
+from client.generate.generate import generate
 from queue import Queue
-from util.util import parseEndpoint
+from client.util.util import parseEndpoint
 
 class Operator:
     sessions = []

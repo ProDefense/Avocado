@@ -4,9 +4,9 @@ import sys
 
 from server.mtls import mtls
 from server.handler.handler import Handler
-from util.util import parseEndpoint
+from client.util.util import parseEndpoint
 from queue import Queue
-from pb import operatorpb_pb2
+from client.pb import operatorpb_pb2
 
 import socket
 import traceback
