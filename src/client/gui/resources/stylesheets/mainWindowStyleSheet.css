@@ -20,3 +20,11 @@ QMenuBar::item {
 QMenuBar::item::selected {
     color: "white"; 
 }
+
+QTabBar::tab:selected {
+	color: white;
+}
+
+QTabBar::tab:!selected {
+	color: white;
+}
