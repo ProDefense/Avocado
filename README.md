@@ -59,4 +59,4 @@ $ docker cp avocado:src/implant .
 ## GUI Operator
 ![GUI Operator](assets/gui.png)
 
-Only manual installation is supported for the GUI operator. See [operator README](client/README.md) for more instructions.
+Only manual installation is supported for the GUI operator. See [operator README](src/client/README.md) for more instructions.
