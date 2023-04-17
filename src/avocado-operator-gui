@@ -110,7 +110,7 @@ if __name__ == "__main__":
     app.setApplicationName("Avocado")
 
     # set logo
-    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "assets/logo.png")
+    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "client/assets/logo.png")
     app.setWindowIcon(QIcon(path))
 
     window = MainApp()
