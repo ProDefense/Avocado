@@ -17,15 +17,6 @@ class Listener:
         self.session_outputq.put(None)
         self._server.shutdown(socket.SHUT_RDWR)
 
-    # convert message to protobuf and send to server
-    def sendGenerate(self, endpoint, target_os):
-        generate_cmd = operatorpb_pb2.Generate(endpoint=endpoint.encode("ascii"), target_os=target_os.encode("ascii"))
-        message = operatorpb_pb2.Message(
-            message_type=operatorpb_pb2.Message.MessageType.Generate, 
-            data=generate_cmd.SerializeToString()
-        )
-        self._server.send(message.SerializeToString())
-
     def sendSession(self, message, session_id):
         session_cmd = operatorpb_pb2.SessionCmd(cmd=message.encode("ascii"),id=session_id)
 
