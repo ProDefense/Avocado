@@ -11,8 +11,11 @@ from queue import Queue
 def main():
     logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
 
-    implant_endpoint = parseEndpoint(input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> "))
-    operator_endpoint = parseEndpoint(input("Enter Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
+    try:
+        implant_endpoint = parseEndpoint(input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> "))
+        operator_endpoint = parseEndpoint(input("Enter Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
+    except KeyboardInterrupt:
+        exit()
 
     print("Listening for implants...")
     print("Listening for operators...")
@@ -34,6 +37,12 @@ def main():
 
     operator_handler = OperatorHandler(operator_endpoint, operators, implant_listener.sessions, implants)
     operator_handler.start()
+
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        exit()
 
 if __name__ == "__main__":
     main()

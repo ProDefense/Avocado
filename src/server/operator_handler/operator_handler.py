@@ -17,7 +17,7 @@ class OperatorHandler:
         self._sock.bind((host, port))
 
     def start(self):
-        threading.Thread(target=self._accept_operator).start() #this is so we can listen and have execute commands from server console
+        threading.Thread(target=self._accept_operator, daemon=True).start() #this is so we can listen and have execute commands from server console
 
     # Turn message into a protobuf SessionCmdOutput and ssend to client
     def _send_operator(self, message, operator, session_id):
@@ -40,7 +40,7 @@ class OperatorHandler:
             self._brodcast_implants(operator)
 
             print("[+]Connected to a new operator at " + address[0] + ":" + str(address[1]) )
-            threading.Thread(target = self._listen_operator,args = (operator,address)).start()
+            threading.Thread(target = self._listen_operator, args=(operator,address), daemon=True).start()
 
     def _listen_operator(self, operator, address):
         size = 1024

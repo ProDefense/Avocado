@@ -36,7 +36,7 @@ class ImplantHandler:
         self._implants = implants 
 
     def start(self):
-        threading.Thread(target=self._handle_implants, args=()).start()
+        threading.Thread(target=self._handle_implants, daemon=True).start()
 
     # Handle incoming registrations
     def _handle_implants(self):

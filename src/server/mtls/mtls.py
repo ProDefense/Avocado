@@ -58,7 +58,7 @@ class Listener:
         self.ssock = self._mkssock(ctx)
 
         # start accepting connections
-        t = threading.Thread(target=self._accept, args=(requestq,))
+        t = threading.Thread(target=self._accept, args=(requestq,), daemon=True)
         t.start()
 
 
@@ -83,7 +83,7 @@ class Listener:
             conn, addr = self.ssock.accept()
             print(f"Accepted connection from {addr}")
             # conn.verify_client_post_handshake()
-            threading.Thread(target=self._handle_conn, args=(requestq, conn, addr)).start()
+            threading.Thread(target=self._handle_conn, args=(requestq, conn, addr), daemon=True).start()
 
     def _handle_conn(self, requestq: Queue, conn: ssl.SSLSocket, addr):
         # Add the session
