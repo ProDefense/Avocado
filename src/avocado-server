@@ -21,18 +21,18 @@ def main():
 
     try:
         implant_listener = Listener(requestq, implant_endpoint) #begins implant listener w/ mtls encryption
-
     except Exception as e:
         print(e)
         traceback.print_exc()
         exit(1)
 
     operators = list()
+    implants = list() # implant is a pair of a registration and id
 
-    implant_handler = ImplantHandler(requestq, operators)
+    implant_handler = ImplantHandler(requestq, operators, implants)
     implant_handler.start()
 
-    operator_handler = OperatorHandler(operator_endpoint, operators, implant_handler, implant_listener)
+    operator_handler = OperatorHandler(operator_endpoint, operators, implant_listener.sessions, implants)
     operator_handler.start()
 
 if __name__ == "__main__":

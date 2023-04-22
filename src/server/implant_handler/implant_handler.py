@@ -3,43 +3,37 @@ import threading
 from queue import Queue
 from client.pb import operatorpb_pb2, implantpb_pb2
 
+# Brodcast an implant registration to all operators
+def brodcastImplant(implant, operators):
+    registration, id = implant
+
+    # converts the groups from implantpb groups to operatorpb groups
+    user_groups = [operatorpb_pb2.SessionInfo.User(id=group.id, name=group.name) for group in registration.groups]
+
+    # brodcast new session information to all operators
+    session_info = operatorpb_pb2.Message(
+        message_type=operatorpb_pb2.Message.MessageType.SessionInfo,
+        data=operatorpb_pb2.SessionInfo(
+                id=str(id),
+                addr=registration.addr,
+                os=registration.os,
+                pid=registration.pid,
+                user=operatorpb_pb2.SessionInfo.User(
+                    id=registration.user.id,
+                    name=registration.user.name
+                ),
+                groups = user_groups
+            ).SerializeToString()
+    ).SerializeToString()
+
+    for c in operators:
+        c.send(session_info)
+
 class ImplantHandler:
-    def __init__(self, requestq: Queue, operators: list):
+    def __init__(self, requestq: Queue, operators: list, implants : list):
         self._requestq = requestq
         self._operators = operators
-        self._implants = list() # implant is a pair of a registration and id
-
-    # Brodcast all current implant registrations to a new operator
-    def brodcastImplants(self, operator):
-        for implant in self._implants:
-            self._brodcast_implant(implant, [operator])
-
-    # Brodcast new implant registration to all operators
-    def _brodcast_implant(self, implant, operators):
-        registration, id = implant
-
-        # converts the groups from implantpb groups to operatorpb groups
-        user_groups = [operatorpb_pb2.SessionInfo.User(id=group.id, name=group.name) for group in registration.groups]
-
-        # brodcast new session information to all operators
-        session_info = operatorpb_pb2.Message(
-            message_type=operatorpb_pb2.Message.MessageType.SessionInfo,
-            data=operatorpb_pb2.SessionInfo(
-                    id=str(id),
-                    addr=registration.addr,
-                    os=registration.os,
-                    pid=registration.pid,
-                    user=operatorpb_pb2.SessionInfo.User(
-                        id=registration.user.id,
-                        name=registration.user.name
-                    ),
-                    groups = user_groups
-                ).SerializeToString()
-        ).SerializeToString()
-
-        for c in operators:
-            c.send(session_info)
-        
+        self._implants = implants 
 
     def start(self):
         threading.Thread(target=self._handle_implants, args=()).start()
@@ -75,4 +69,4 @@ class ImplantHandler:
 
             new_implant = (registration,id)
             self._implants.append(new_implant)
-            self._brodcast_implant(new_implant, self._operators)
+            brodcastImplant(new_implant, self._operators)
