@@ -12,8 +12,8 @@ def main():
     logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
 
     try:
-        implant_endpoint = parseEndpoint(input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> "))
-        operator_endpoint = parseEndpoint(input("Enter Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
+        implant_endpoint = parseEndpoint(input("Enter Implant Listener Address (Example: 172.17.0.2:31337)\n> "))
+        operator_endpoint = parseEndpoint(input("Enter Operator Listener Address (Example: 172.17.0.2:31337)\n> "))
     except KeyboardInterrupt:
         exit()
 
