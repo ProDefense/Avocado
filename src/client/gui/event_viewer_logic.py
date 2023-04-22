@@ -17,8 +17,9 @@ class EventViewer(QWidget, Ui_EventViewer):
         return eventStyleSheet.read()
 
     def handleTest(self):
-        self.textEdit.append('Event Viewer logging..')
+        self.textEdit.append('Event Viewer logging...')
 
     def logToEventViewer(self, text):
         self.textEdit.append(text)
+        self.textEdit.verticalScrollBar().setValue(self.textEdit.verticalScrollBar().maximum())
 
