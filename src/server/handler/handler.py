@@ -4,7 +4,7 @@ from queue import Queue
 from client.pb import operatorpb_pb2, implantpb_pb2
 
 class Handler:
-    def __init__(self, requestq: Queue, operators: dict):
+    def __init__(self, requestq: Queue, operators: list):
         self._requestq = requestq
         self._operators = operators
         self._implants = list() # implant is a pair of a registration and id

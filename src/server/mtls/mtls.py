@@ -9,6 +9,7 @@ import sys
 from client.certs.certs import cert_generator
 from client.pb import implantpb_pb2
 from queue import Queue
+from typing import Tuple
 
 
 # A thread safe dict of sessions and their ids
@@ -42,7 +43,7 @@ class Sessions:
 
 
 class Listener:
-    def __init__(self, requestq: Queue, endpoint : tuple [str, int]):
+    def __init__(self, requestq: Queue, endpoint : Tuple [str, int]):
         self.host, self.port = endpoint
         self.sessions = Sessions()
         # Automatically generate CA certificates for the server
