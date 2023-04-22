@@ -79,9 +79,9 @@ class Operator:
 
                 elif command[0] == "use":
                     if command[1] not in self.sessions:
-                        print(b"Session doesn't exist")
+                        print("Session doesn't exist")
 
-                    if len(command) == 2:
+                    elif len(command) == 2:
                         self.inputHandler(listener, output_received, command[1], command[1]) 
 
                     else:
