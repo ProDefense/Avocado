@@ -29,17 +29,12 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.connect_screen.exec()
 
         # set up connection w/ server
-        # test these values
-        # hostname = "127.0.0.1"
-        # port = 12345
-
         hostname = self.connect_screen.hostname_text
         port = int(self.connect_screen.port_text)
 
         implantq = Queue()
         session_outputq = Queue()
 
-        # if hostname is not None and port is not None:
         self.listener = Listener(hostname, port, session_outputq, implantq)
 
         self.generateAction.triggered.connect(self.generateScreen)
