@@ -3,18 +3,18 @@ import threading
 from client.pb import operatorpb_pb2
 
 class RPCClient:
-    def __init__(self, hostname, port, session_outputq, implantq):
-        self.implantq = implantq
-        self.session_outputq = session_outputq
+    def __init__(self, hostname, port, outputq, implantq):
+        self._implantq = implantq
+        self._outputq = outputq
         
         self._server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self._server.connect((hostname,port))
 
-        threading.Thread(target=self._listen, args=(session_outputq, implantq)).start()
+        threading.Thread(target=self._listen).start()
 
     def terminate(self):
-        self.implantq.put(None)
-        self.session_outputq.put(None)
+        self._implantq.put(None)
+        self._outputq.put(None)
         self._server.shutdown(socket.SHUT_RDWR)
 
     def sendSession(self, message, session_id):
@@ -27,7 +27,7 @@ class RPCClient:
 
         self._server.send(message.SerializeToString())
 
-    def _listen(self, session_outputq, implantq):
+    def _listen(self):
         while True:
             data = self._server.recv(1024)
 
@@ -38,12 +38,12 @@ class RPCClient:
                 if message.message_type == operatorpb_pb2.Message.MessageType.SessionInfo:
                     session_info = operatorpb_pb2.SessionInfo()
                     session_info.ParseFromString(message.data)
-                    implantq.put(session_info)
+                    self._implantq.put(session_info)
 
                 elif message.message_type == operatorpb_pb2.Message.MessageType.SessionCmdOutput:
-                    session_output = operatorpb_pb2.SessionCmdOutput()
-                    session_output.ParseFromString(message.data)
-                    session_outputq.put((session_output.cmdOutput, session_output.id))
+                    output = operatorpb_pb2.SessionCmdOutput()
+                    output.ParseFromString(message.data)
+                    self._outputq.put((output.cmdOutput, output.id))
 
             else:
                 break

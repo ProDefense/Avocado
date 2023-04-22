@@ -33,11 +33,11 @@ class MainApp(QMainWindow, Ui_MainWindow):
         port = int(self.connect_screen.port_text)
 
         implantq = Queue()
-        session_outputq = Queue()
+        outputq = Queue()
 
-        self.rpc_client = RPCClient(hostname, port, session_outputq, implantq)
+        self.rpc_client = RPCClient(hostname, port, outputq, implantq)
 
-        self.generateAction.triggered.connect(self.generateScreen)
+        self.generateAction.triggered.connect(self._generate_screen)
 
         layout = QVBoxLayout()
 
@@ -45,7 +45,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.event_viewer = EventViewer()
         self.event_viewer.logToEventViewer(f"Connected to server {hostname}:{port} ")
 
-        tabwidget = TabWidget(self.rpc_client, session_outputq, self.event_viewer)
+        tabwidget = TabWidget(self.rpc_client, outputq, self.event_viewer)
         self.remote_machines = RemoteMachines(tabwidget, self.event_viewer)
 
         hlay = QHBoxLayout()
@@ -69,14 +69,14 @@ class MainApp(QMainWindow, Ui_MainWindow):
 
         self.setCentralWidget(widget)
 
-        threading.Thread(target=self.implantHandler, args=(implantq,)).start()
+        threading.Thread(target=self._implant_handler, args=(implantq,)).start()
 
     def closeEvent(self, event):
         self.rpc_client.terminate()
         event.accept()
 
     # handle new implants
-    def implantHandler(self,implantq):
+    def _implant_handler(self,implantq):
         while True:
             new_implant = implantq.get()
             if new_implant:
@@ -91,14 +91,13 @@ class MainApp(QMainWindow, Ui_MainWindow):
             else:
                 break
 
-    def generateScreen(self):
+    def _generate_screen(self):
         self.generate_screen = GenerateScreen()
         self.generate_screen.show()
 
     def loadStyleSheet(self):
         remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/mainWindowStyleSheet.css", "r")
         return remoteMachinesStyleSheet.read()
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

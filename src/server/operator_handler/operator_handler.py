@@ -5,16 +5,16 @@ from server.mtls.mtls import session
 from server.implant_handler.implant_handler import brodcastImplant
 
 class OperatorHandler:
-    def __init__(self, operator_endpoint, operators, sessions, implants):
+    def __init__(self, endpoint, operators, sessions, implants):
+        host, port = endpoint
+
         self._operators = operators
         self._implants = implants
         self._sessions = sessions
 
-        host, port = operator_endpoint
-
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind((host, port))
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self._sock.bind((host, port))
 
     def start(self):
         threading.Thread(target=self._accept_operator).start() #this is so we can listen and have execute commands from server console
@@ -32,9 +32,9 @@ class OperatorHandler:
 
     def _accept_operator(self):
         numberOfUsers = 5
-        self.sock.listen(numberOfUsers)
+        self._sock.listen(numberOfUsers)
         while True: #keep listening, start a new thread when an operator connects
-            operator, address = self.sock.accept()
+            operator, address = self._sock.accept()
 
             self._operators.append(operator)
             self._brodcast_implants(operator)

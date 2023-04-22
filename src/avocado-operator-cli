@@ -6,40 +6,40 @@ from queue import Queue
 from client.util.util import parseEndpoint
 
 class Operator:
-    sessions = []
-
     def __init__(self):
         hostname, port = parseEndpoint(input("Enter Server Operator Listener Address (Example: 172.17.0.2:31337)\n> "))
 
         implantq = Queue()
-        session_outputq = Queue()
+        outputq = Queue()
 
-        rpc_client = RPCClient(hostname, port, session_outputq, implantq)
+        self._rpc_client = RPCClient(hostname, port, outputq, implantq)
 
-        # output_received is a workaround for i/o issue
+        # _output_received is a workaround for i/o issue
         # i.e. the server response overwrites the user input prompt
-        output_received = threading.Event()  
-        output_received.set()  
+        self._output_received = threading.Event()  
+        self._output_received.set()  
 
-        threading.Thread(target=self.implantHandler, args=(implantq,)).start()
-        threading.Thread(target=self.sessionOutputHandler, args=(session_outputq, output_received)).start()
-        threading.Thread(target=self.inputHandler, args=(rpc_client, output_received, "Avocado")).start()
+        self._sessions = []
+
+        threading.Thread(target=self._implant_handler, args=(implantq,)).start()
+        threading.Thread(target=self._output_handler, args=(outputq,)).start()
+        threading.Thread(target=self._input_handler, args=("Avocado",)).start()
 
     # handle new implants
-    def implantHandler(self, implantq):
+    def _implant_handler(self, implantq):
         while True:
             new_implant = implantq.get()
 
             if new_implant:
-                self.sessions.append(new_implant.id)
+                self._sessions.append(new_implant.id)
 
             else:
                 break
 
     # prints output messages received from the server
-    def sessionOutputHandler(self, session_outputq, output_received):
+    def _output_handler(self, outputq):
         while True:
-            output = session_outputq.get()
+            output = outputq.get()
 
             if not output:
                 break
@@ -47,11 +47,11 @@ class Operator:
             else:
                 print(output[0])
 
-            output_received.set() 
+            self._output_received.set() 
 
-    def inputHandler(self, rpc_client, output_received, title, session_id=None):
+    def _input_handler(self, title, session_id=None):
         while True:
-            output_received.wait()
+            self._output_received.wait()
 
             msg = input(f"[{title}] > ")
 
@@ -59,14 +59,14 @@ class Operator:
                 continue
 
             elif (session_id):
-                rpc_client.sendSession(msg, session_id)
-                output_received.clear()  
+                self._rpc_client.sendSession(msg, session_id)
+                self._output_received.clear()  
 
             else:
                 command = msg.split()
 
                 if command[0] == "sessions":
-                    for s in self.sessions:
+                    for s in self._sessions:
                         print(s)
 
                 elif command[0] == "generate":
@@ -78,11 +78,11 @@ class Operator:
                         generate(command[1], command[2])
 
                 elif command[0] == "use":
-                    if command[1] not in self.sessions:
+                    if command[1] not in self._sessions:
                         print("Session doesn't exist")
 
                     elif len(command) == 2:
-                        self.inputHandler(rpc_client, output_received, command[1], command[1]) 
+                        self._input_handler(command[1], command[1]) 
 
                     else:
                         print(b"Usage: use <session>")
@@ -91,7 +91,7 @@ class Operator:
                 print(f"[+]{title} Terminated")
 
                 if title=="Avocado":
-                    rpc_client.terminate()
+                    self._rpc_client.terminate()
 
                 break
 

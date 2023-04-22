@@ -7,7 +7,7 @@ from PyQt6.QtCore import QTimer
 
 
 class TabWidget(QDialog):
-    def __init__(self, listener, session_outputq, event_viewer):
+    def __init__(self, listener, outputq, event_viewer):
         super().__init__()
 
         self.tab_id = {}
@@ -24,7 +24,7 @@ class TabWidget(QDialog):
         self.tabwidget.currentChanged.connect(self.onChange)
         self.tabwidget.tabCloseRequested.connect(self.onClose)
 
-        threading.Thread(target=self.sessionOutputHandler, args=(session_outputq,)).start()
+        threading.Thread(target=self.sessionOutputHandler, args=(outputq,)).start()
 
     def onClose(self, index):
         widget = self.tabwidget.widget(index)
@@ -49,9 +49,9 @@ class TabWidget(QDialog):
         self.tabwidget.setCurrentIndex(tab)
 
     # prints output messages received from the server
-    def sessionOutputHandler(self, session_outputq):
+    def sessionOutputHandler(self, outputq):
         while True:
-            out = session_outputq.get()
+            out = outputq.get()
 
             if not out:
                 break
