@@ -13,7 +13,7 @@ from client.gui.connect_screen_logic import ConnectScreen
 from client.gui.generate_screen_logic import GenerateScreen
 from client.gui.event_viewer_logic import EventViewer
 from client.gui.views.main_window import Ui_MainWindow
-from client.listener.listener import Listener
+from client.rpc_client.rpc_client import RPCClient
 
 # Main app that connects widgets into one window
 class MainApp(QMainWindow, Ui_MainWindow):
@@ -35,7 +35,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         implantq = Queue()
         session_outputq = Queue()
 
-        self.listener = Listener(hostname, port, session_outputq, implantq)
+        self.rpc_client = RPCClient(hostname, port, session_outputq, implantq)
 
         self.generateAction.triggered.connect(self.generateScreen)
 
@@ -45,7 +45,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         self.event_viewer = EventViewer()
         self.event_viewer.logToEventViewer(f"Connected to server {hostname}:{port} ")
 
-        tabwidget = TabWidget(self.listener, session_outputq, self.event_viewer)
+        tabwidget = TabWidget(self.rpc_client, session_outputq, self.event_viewer)
         self.remote_machines = RemoteMachines(tabwidget, self.event_viewer)
 
         hlay = QHBoxLayout()
@@ -72,7 +72,7 @@ class MainApp(QMainWindow, Ui_MainWindow):
         threading.Thread(target=self.implantHandler, args=(implantq,)).start()
 
     def closeEvent(self, event):
-        self.listener.terminate()
+        self.rpc_client.terminate()
         event.accept()
 
     # handle new implants

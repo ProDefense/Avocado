@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import threading
-from client.listener.listener import Listener
+from client.rpc_client.rpc_client import RPCClient
 from client.generate.generate import generate
 from queue import Queue
 from client.util.util import parseEndpoint
@@ -9,12 +9,12 @@ class Operator:
     sessions = []
 
     def __init__(self):
-        hostname, port = parseEndpoint(input("Enter Server Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
+        hostname, port = parseEndpoint(input("Enter Server Operator Listener Address (Example: 172.17.0.2:31337)\n> "))
 
         implantq = Queue()
         session_outputq = Queue()
 
-        listener = Listener(hostname, port, session_outputq, implantq)
+        rpc_client = RPCClient(hostname, port, session_outputq, implantq)
 
         # output_received is a workaround for i/o issue
         # i.e. the server response overwrites the user input prompt
@@ -23,7 +23,7 @@ class Operator:
 
         threading.Thread(target=self.implantHandler, args=(implantq,)).start()
         threading.Thread(target=self.sessionOutputHandler, args=(session_outputq, output_received)).start()
-        threading.Thread(target=self.inputHandler, args=(listener, output_received, "Avocado")).start()
+        threading.Thread(target=self.inputHandler, args=(rpc_client, output_received, "Avocado")).start()
 
     # handle new implants
     def implantHandler(self, implantq):
@@ -49,7 +49,7 @@ class Operator:
 
             output_received.set() 
 
-    def inputHandler(self, listener, output_received, title, session_id=None):
+    def inputHandler(self, rpc_client, output_received, title, session_id=None):
         while True:
             output_received.wait()
 
@@ -59,7 +59,7 @@ class Operator:
                 continue
 
             elif (session_id):
-                listener.sendSession(msg, session_id)
+                rpc_client.sendSession(msg, session_id)
                 output_received.clear()  
 
             else:
@@ -82,7 +82,7 @@ class Operator:
                         print("Session doesn't exist")
 
                     elif len(command) == 2:
-                        self.inputHandler(listener, output_received, command[1], command[1]) 
+                        self.inputHandler(rpc_client, output_received, command[1], command[1]) 
 
                     else:
                         print(b"Usage: use <session>")
@@ -91,7 +91,7 @@ class Operator:
                 print(f"[+]{title} Terminated")
 
                 if title=="Avocado":
-                    listener.terminate()
+                    rpc_client.terminate()
 
                 break
 

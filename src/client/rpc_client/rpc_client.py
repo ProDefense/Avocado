@@ -2,7 +2,7 @@ import socket
 import threading
 from client.pb import operatorpb_pb2
 
-class Listener:
+class RPCClient:
     def __init__(self, hostname, port, session_outputq, implantq):
         self.implantq = implantq
         self.session_outputq = session_outputq
