@@ -3,7 +3,7 @@ import threading
 from queue import Queue
 from client.pb import operatorpb_pb2, implantpb_pb2
 
-class Handler:
+class ImplantHandler:
     def __init__(self, requestq: Queue, operators: list):
         self._requestq = requestq
         self._operators = operators
@@ -42,8 +42,7 @@ class Handler:
         
 
     def start(self):
-        t = threading.Thread(target=self._handle_implants, args=())
-        t.start()
+        threading.Thread(target=self._handle_implants, args=()).start()
 
     # Handle incoming registrations
     def _handle_implants(self):
