@@ -31,7 +31,7 @@ class TabWidget(QDialog):
         del self.tab_id[widget.id]
         widget.deleteLater()
         self.tabwidget.removeTab(index)
-        self.event_viewer.logToEventViewer(f"Closing session with implant {id}")
+        self.event_viewer.logToEventViewer(f"Closing session with implant {widget.id}")
 
     def onChange(self, index):
         if (index != -1):
