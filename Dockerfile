@@ -2,7 +2,7 @@ FROM postgres
 
 # WARNING: This docker file is used for testing only.
 
-USER root
+#USER root
 
 RUN \
   # Just Debian things
@@ -10,20 +10,21 @@ RUN \
   apt install curl build-essential binutils-mingw-w64 mingw-w64 python3 python3-pip musl musl-dev musl-tools protobuf-compiler postgresql-contrib -y && \
   ln -s /usr/bin/python3 /usr/local/bin/python && \
   # Install mkcert
-  curl -JL "https://dl.filippo.io/mkcert/latest?for=linux/amd64" -o /usr/local/bin/mkcert && \
-  chmod +x /usr/local/bin/mkcert && \
-  useradd -M avocado
+  curl -JL "https://dl.filippo.io/mkcert/latest?for=linux/amd64" -o /usr/bin/mkcert && \
+  chmod +x /usr/bin/mkcert
+  #chmod +x /usr/bin/mkcert && \
+  #useradd -M avocado
 
-COPY . /home/avocado
-RUN chown -R avocado:avocado /home/avocado
-WORKDIR /home/avocado
+COPY . /root
+#RUN chown -R avocado:avocado /root
+WORKDIR /root
 #USER avocado
 
 ENV POSTGRES_PASSWORD password
 ENV POSTGRES_DB loot
 COPY avocado.sql /docker-entrypoint-initdb.d/
 
-USER root
+#USER root
 
 #EXPOSE 5432
 
