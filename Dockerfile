@@ -28,6 +28,8 @@ COPY avocado.sql /docker-entrypoint-initdb.d/
 
 #EXPOSE 5432
 
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 RUN \
   # Install python packages
   pip install -r requirements.txt && \
@@ -43,6 +45,8 @@ RUN \
   cargo check --release --target=x86_64-unknown-linux-musl --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked linux" && \
   echo "alias ls='ls --color'" >> $HOME/.bashrc && \
   echo 'export PATH=$HOME/.cargo/bin:$PATH' >> $HOME/.bashrc
+  #ln -s /root/.cargo/bin/cargo /usr/bin/cargo
+
 
 #USER avocado
 #CMD [ "/bin/bash" ]
