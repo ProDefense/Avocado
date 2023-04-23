@@ -1,6 +1,7 @@
 --CREATE TABLESPACE db
---    OWNER CURRENT_USER
---    LOCATION '~/postgres/data';
+ --   OWNER CURRENT_USER
+  --  LOCATION '/home/avocado/src/db/postgres/data';
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE Implants 
