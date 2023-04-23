@@ -34,7 +34,7 @@ class Profile:
 
     def _cargo_build(self, cargo_toml_path: str) -> int:
         path = os.environ["PATH"]
-        args = ["/usr/bin/cargo", "build", "-Z", "unstable-options", "--manifest-path", cargo_toml_path, "--out-dir", self.out_dir, "--release"]
+        args = ["cargo", "build", "-Z", "unstable-options", "--manifest-path", cargo_toml_path, "--out-dir", self.out_dir, "--release"]
         if self.target_os == "linux":
             args.extend(["-Z", "build-std=std,panic_abort",])
             args.extend(["-Z", "build-std-features=panic_immediate_abort"])
