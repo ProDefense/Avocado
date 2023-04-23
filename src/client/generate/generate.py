@@ -33,7 +33,7 @@ class Profile:
             print(f"Subprocess error: cargo build failed with exit code {exit_code}")
 
     def _cargo_clean(self, cargo_toml_path: str) -> int:
-        args = ["/usr/bin/cargo", "clean", "--manifest-path", cargo_toml_path]
+        args = ["cargo", "clean", "--manifest-path", cargo_toml_path]
         exit_code = subprocess.Popen(
             args,
             stdout=subprocess.DEVNULL,
