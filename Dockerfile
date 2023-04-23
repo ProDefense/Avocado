@@ -7,7 +7,7 @@ USER root
 RUN \
   # Just Debian things
   apt update && \
-  apt install curl build-essential binutils-mingw-w64 mingw-w64 python3 python3-pip musl musl-dev musl-tools protobuf-compiler -y && \
+  apt install curl build-essential binutils-mingw-w64 mingw-w64 python3 python3-pip musl musl-dev musl-tools protobuf-compiler postgresql-contrib -y && \
   ln -s /usr/bin/python3 /usr/local/bin/python && \
   # Install mkcert
   curl -JL "https://dl.filippo.io/mkcert/latest?for=linux/amd64" -o /usr/local/bin/mkcert && \
@@ -20,7 +20,7 @@ WORKDIR /home/avocado
 #USER avocado
 
 ENV POSTGRES_PASSWORD password
-ENV POSTGRES_DB user
+ENV POSTGRES_DB loot
 COPY avocado.sql /docker-entrypoint-initdb.d/
 
 USER root
