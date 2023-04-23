@@ -69,7 +69,7 @@ avocado$ ./main.py
 ```
 The implant will be output into the current working directory.
 
-5. **Clean containers once done**
+5. **Clean containers & free up space once done**
 ```
-
+$ docker system prune -a
 ```
