@@ -32,7 +32,17 @@ class Profile:
         if exit_code != 0 and exit_code != 1:
             print(f"Subprocess error: cargo build failed with exit code {exit_code}")
 
+    def _cargo_clean(self, cargo_toml_path: str) -> int:
+        args = ["/usr/bin/cargo", "clean", "--manifest-path", cargo_toml_path]
+        exit_code = subprocess.Popen(
+            args,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        ).wait()
+        return exit_code
+
     def _cargo_build(self, cargo_toml_path: str) -> int:
+        self._cargo_clean(cargo_toml_path)
         path = os.environ["PATH"]
         args = ["/usr/bin/cargo", "build", "-Z", "unstable-options", "--manifest-path", cargo_toml_path, "--out-dir", self.out_dir, "--release"]
         if self.target_os == "linux":
