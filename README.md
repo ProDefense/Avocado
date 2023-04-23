@@ -29,20 +29,42 @@
 ## Quick Start
 
 Avocado currently only supports a Docker installation.
-1. **Build and run docker container**
+1. **Build docker container**
 ```
 $ docker build . -t avocado
-$ docker run --rm --name avocado -it avocado
 ```
 
-2. **Inside the container, run the server**
+1.1 **Check if port 5432 is in use & stop if necessary, create/start the container**
+```
+$ sudo netstat -plnt | grep 5432
+$ sudo lsof -t -i:5432 | xargs kill -9
+$ docker run -d --name avocado-container -p 5432:5432 avocado
+```
+
+1.2 **If hash is outputted after previous command, container was built successfully. Grab container ID and exec docker. This assumes you have more than one Docker container. If not the case, ignore first two commands and use isolated line**
+```
+$ docker ps -a
+$ docker exec -it <avocado_container ID> /bin/bash
+$ docker start avocado-container
+$ docker exec -it $(docker ps -aq) /bin/bash
+```
+
+2 **Verify database creation & tables are created**
+```
+$ psql -U postgres
+postgres-# \c loot
+loot-# \dt
+```
+
+3. **Inside the container, run the server**
 ```
 avocado$ cd src/server
 avocado$ ./main.py
 ```
 
-3. **Inside the container, compile and run the implant.**
+4. **Inside the container, compile and run the implant.**
 ```
 > generate
 ```
 The implant will be output into the current working directory.
+
