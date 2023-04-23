@@ -34,10 +34,10 @@ Avocado currently only supports a Docker installation.
 $ docker build . -t avocado
 ```
 
-1.1 **Check if port 5432 is in use & stop if necessary, create/start the container**
+1.1 **Check if port 5432 is in use & stop if necessary. By default, postgresql should be running on there if installed. Then create/start the container**
 ```
 $ sudo netstat -plnt | grep 5432
-$ sudo lsof -t -i:5432 | xargs kill -9
+$ service postgresql stop
 $ docker run -d --name avocado-container -p 5432:5432 avocado
 ```
 
@@ -45,15 +45,16 @@ $ docker run -d --name avocado-container -p 5432:5432 avocado
 ```
 $ docker ps -a
 $ docker exec -it <avocado_container ID> /bin/bash
-$ docker start avocado-container
+
 $ docker exec -it $(docker ps -aq) /bin/bash
 ```
 
-2 **Verify database creation & tables are created**
+2 **Verify database creation & tables are created. Once verified exit to go back to Docker interface**
 ```
 $ psql -U postgres
 postgres-# \c loot
 loot-# \dt
+loot-# \q
 ```
 
 3. **Inside the container, run the server**
@@ -68,3 +69,7 @@ avocado$ ./main.py
 ```
 The implant will be output into the current working directory.
 
+5. **Clean containers once done**
+```
+
+```
