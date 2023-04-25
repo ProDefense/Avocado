@@ -21,7 +21,7 @@ WORKDIR /root
 #USER avocado
 
 ENV POSTGRES_PASSWORD password
-ENV POSTGRES_DB loot
+ENV POSTGRES_DB test_db
 COPY avocado.sql /docker-entrypoint-initdb.d/
 
 #USER root
