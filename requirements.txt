@@ -1,4 +1,4 @@
-PyQt6==6.4.0
-PyQt6-Qt6==6.4.0
-PyQt6-sip==13.4.0
-protobuf==4.21.9
+cffi==1.15.1
+cryptography==40.0.2
+protobuf==4.22.3
+pycparser==2.21

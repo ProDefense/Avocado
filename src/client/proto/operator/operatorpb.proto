@@ -1,0 +1,45 @@
+// Create protobuf messages for communication between the server and implant
+syntax = "proto3";
+package operatorpb;
+
+// Python (the worst programming language in existence (sadeli's opinion)) stores protobufs 
+// as byte objects and will happily deserialize literally anything into any protobuf of any type.
+// There's no way to guarantee the type of the protocol buffer without metadata,
+// so this "Box" containing type data is a workaround.
+
+message Message {
+  enum MessageType {
+    SessionCmd = 0;
+    SessionCmdOutput = 1;
+    SessionInfo = 2;
+  }
+  MessageType message_type = 1;
+  bytes data = 2;
+}
+
+// Command to send to session
+message SessionCmd {
+  string cmd = 1;
+  string id = 2;
+}
+
+// Output from session
+message SessionCmdOutput {
+  string cmdOutput = 1;
+  string id = 2;
+}
+
+// Information about a session
+message SessionInfo {
+  string id = 1;
+  string addr = 2;
+  string os = 3;
+  uint32 pid = 4;
+  // A user/group on a linux machine
+  message User {
+    uint32 id = 1;
+    string name = 2;
+  }
+  User user = 5; // The user running the implant
+  repeated User groups = 6; // The groups this user is a part of
+}

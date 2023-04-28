@@ -1,0 +1,30 @@
+QWidget {
+    background-color: #181926;
+}
+QPushButton {
+    font-size: 16px;
+    background-color: "darkblue"
+}
+QMenuBar {
+    color: "white";
+}
+
+QMenu {
+    color: "white";
+}
+
+QMenuBar::item {
+    color: "white"; 
+}
+
+QMenuBar::item::selected {
+    color: "white"; 
+}
+
+QTabBar::tab:selected {
+	color: white;
+}
+
+QTabBar::tab:!selected {
+	color: white;
+}

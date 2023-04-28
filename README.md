@@ -41,8 +41,22 @@ avocado$ cd src/server
 avocado$ ./main.py
 ```
 
-3. **Inside the container, compile and run the implant.**
+4. **On another terminal, run the the operator (only CLI operator is supported via Docker)**
 ```
-> generate
+$ docker exec -it avocado src/avocado-operator-cli
 ```
-The implant will be output into the current working directory.
+
+5. **Using the operator, compile and run the implant.**
+```
+[avocado] > generate <host:port> <linux|windows>
+```
+
+The implant will be output into the current working directory. If you wish to copy it to your local machine:
+```
+$ docker cp avocado:src/implant .
+```
+
+## GUI Operator
+![GUI Operator](assets/gui.png)
+
+Only manual installation is supported for the GUI operator. See [operator README](src/client/README.md) for more instructions.

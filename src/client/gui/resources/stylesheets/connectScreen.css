@@ -1,0 +1,13 @@
+QWidget {
+    background-color: #181926;
+    color: "white";
+}
+QPushButton {
+    font-size: 16px;
+    background-color: "darkblue"
+}
+QTextEdit {
+    /*background-color: "white";*/
+    background-color: #24273A;
+    color: "white";
+}

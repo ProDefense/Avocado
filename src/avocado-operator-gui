@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+import os
+import sys
+import ast
+import threading
+from queue import Queue
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout
+from PyQt6.QtGui import QIcon, QAction
+from PyQt6.uic.properties import QtGui
+from client.gui.active_session_logic import TabWidget
+from client.gui.remote_machines_logic import RemoteMachines
+from client.gui.connect_screen_logic import ConnectScreen
+from client.gui.generate_screen_logic import GenerateScreen
+from client.gui.event_viewer_logic import EventViewer
+from client.gui.views.main_window import Ui_MainWindow
+from client.rpc_client.rpc_client import RPCClient
+
+# Main app that connects widgets into one window
+class MainApp(QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        Ui_MainWindow.__init__(self)
+        self.setupUi(self)
+
+        hostname, port = None, None
+
+        # Must put in hostname / port
+        self.connect_screen = ConnectScreen()
+        self.connect_screen.exec()
+
+        # set up connection w/ server
+        hostname = self.connect_screen.hostname_text
+        port = int(self.connect_screen.port_text)
+
+        implantq = Queue()
+        outputq = Queue()
+
+        self.rpc_client = RPCClient(hostname, port, outputq, implantq)
+
+        self.generateAction.triggered.connect(self._generate_screen)
+
+        layout = QVBoxLayout()
+
+        # add active session and remote machines table to one widget
+        self.event_viewer = EventViewer()
+        self.event_viewer.logToEventViewer(f"Connected to server {hostname}:{port} ")
+
+        tabwidget = TabWidget(self.rpc_client, outputq, self.event_viewer)
+        self.remote_machines = RemoteMachines(tabwidget, self.event_viewer)
+
+        hlay = QHBoxLayout()
+        hlay.addWidget(self.remote_machines)
+        hlay.addWidget(self.event_viewer)
+
+        hWidget = QWidget()
+        hWidget.setLayout(hlay)
+
+        # Here, add a horizontal widget
+        layout.addWidget(hWidget)
+
+        layout.addWidget(tabwidget)
+
+        # widget holds layout
+        widget = QWidget()
+        widget.setLayout(layout)
+        # stylesheet
+        self.mainAppStyleSheet = self.loadStyleSheet()
+        self.setStyleSheet(self.mainAppStyleSheet)
+
+        self.setCentralWidget(widget)
+
+        threading.Thread(target=self._implant_handler, args=(implantq,)).start()
+
+    def closeEvent(self, event):
+        self.rpc_client.terminate()
+        event.accept()
+
+    # handle new implants
+    def _implant_handler(self,implantq):
+        while True:
+            new_implant = implantq.get()
+            if new_implant:
+                self.remote_machines.addImplant([
+                    new_implant.id,
+                    ast.literal_eval(new_implant.addr)[0],
+                    ast.literal_eval(new_implant.addr)[1],
+                    new_implant.os,
+                    new_implant.pid,
+                    new_implant.user.name])
+
+            else:
+                break
+
+    def _generate_screen(self):
+        self.generate_screen = GenerateScreen()
+        self.generate_screen.show()
+
+    def loadStyleSheet(self):
+        remoteMachinesStyleSheet = open("client/gui/resources/stylesheets/mainWindowStyleSheet.css", "r")
+        return remoteMachinesStyleSheet.read()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    app.setApplicationName("Avocado")
+
+    # set logo
+    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "client/assets/logo.png")
+    app.setWindowIcon(QIcon(path))
+
+    window = MainApp()
+    window.show()
+
+    sys.exit(app.exec())

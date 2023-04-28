@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>717</width>
+    <height>572</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Academy Engraved LET</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Avocado 🥑</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QWidget{
+background-color:#16161D
+}</string>
+   </property>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>717</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuImplant">
+    <property name="title">
+     <string>Implant</string>
+    </property>
+    <addaction name="generateAction"/>
+   </widget>
+   <addaction name="menuImplant"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAbout">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>About Avocado</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences...</string>
+   </property>
+  </action>
+  <action name="actionQuit_Avocado">
+   <property name="text">
+    <string>Quit Avocado</string>
+   </property>
+  </action>
+  <action name="actionPlaceholder">
+   <property name="text">
+    <string>Placeholder</string>
+   </property>
+  </action>
+  <action name="actionPlaceholder_2">
+   <property name="text">
+    <string>Placeholder</string>
+   </property>
+  </action>
+  <action name="generateAction">
+   <property name="text">
+    <string>Generate</string>
+   </property>
+  </action>
+  <action name="actionPlaceholder_4">
+   <property name="text">
+    <string>Placeholder</string>
+   </property>
+  </action>
+  <action name="actionPlaceholder_5">
+   <property name="text">
+    <string>Placeholder</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
