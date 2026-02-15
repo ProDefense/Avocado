@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import os
 import traceback
 
 from server.mtls.mtls import Listener
@@ -12,8 +13,14 @@ def main():
     logging.basicConfig(filename="Command Log.txt", level=logging.INFO)
 
     try:
-        implant_endpoint = parseEndpoint(input("Enter Implant Listener Address (Example: 172.17.0.2:31337)\n> "))
-        operator_endpoint = parseEndpoint(input("Enter Operator Listener Address (Example: 172.17.0.2:31337)\n> "))
+        implant_addr = os.environ.get("IMPLANT_LISTENER")
+        operator_addr = os.environ.get("OPERATOR_LISTENER")
+        if implant_addr and operator_addr:
+            implant_endpoint = parseEndpoint(implant_addr)
+            operator_endpoint = parseEndpoint(operator_addr)
+        else:
+            implant_endpoint = parseEndpoint(input("Enter Implant Listener Address (Example: 172.17.0.2:31337)\n> "))
+            operator_endpoint = parseEndpoint(input("Enter Operator Listener Address (Example: 172.17.0.2:31337)\n> "))
     except KeyboardInterrupt:
         exit()
 

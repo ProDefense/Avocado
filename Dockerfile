@@ -1,37 +1,34 @@
-FROM --platform=linux/amd64 archlinux
+FROM --platform=linux/amd64 ubuntu:24.04
 
-# WARNING: This docker file is used for testing only.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    gcc-mingw-w64-x86-64 \
+    g++-mingw-w64-x86-64 \
+    libffi-dev \
+    musl-tools \
+    protobuf-compiler \
+    python3 \
+    python3-dev \
+    python3-pip \
+    && useradd -M avocado \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN \
-  pacman -Sy base-devel rustup python python-pip protobuf mingw-w64-gcc musl --noconfirm && \
-  useradd -M avocado
-
-# Running an ubuntu docker container
-#FROM --platform=linux/amd64 ubuntu:latest
-#
-#RUN apt-get update && \
-#    apt-get install -y protobuf-compiler && \
-#    curl --proto '=https' --tisv1.2 https://sh.rustup.rs -sSf | sh && \
-#    apt-get install -y python3.10 python3-pip && \
-#    useradd -M avocado
-#
-#RUN pip install --upgrade pip && pip install PyQt6-sip==13.4.0
-
-# End of ubuntu docker container install instructions
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 COPY . /home/avocado
-RUN chown -R avocado:avocado /home/avocado
+RUN chown -R avocado:avocado /home/avocado && chmod +x /home/avocado/entrypoint.sh
+
 WORKDIR /home/avocado
 USER avocado
+ENV PATH="/home/avocado/.cargo/bin:${PATH}"
+ENTRYPOINT ["/home/avocado/entrypoint.sh"]
 
-RUN \
-  pip install -r requirements.txt && \
-  rustup default nightly && \
-  rustup target add x86_64-unknown-linux-musl && \
-  rustup target add x86_64-pc-windows-gnu && \
-  rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu && \
-  cargo check --release --target=x86_64-pc-windows-gnu --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked windows" && \
-  cargo check --release --target=x86_64-unknown-linux-musl --manifest-path=$HOME/src/implant/Cargo.toml || echo "checked linux" && \
-  echo "alias ls='ls --color'" >> $HOME/.bashrc
+RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none \
+    && . "$HOME/.cargo/env" \
+    && rustup default nightly \
+    && rustup target add x86_64-unknown-linux-musl x86_64-pc-windows-gnu \
+    && rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 
-CMD [ "/bin/bash" ]
+CMD ["server"]

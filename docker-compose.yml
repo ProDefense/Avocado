@@ -1,0 +1,27 @@
+services:
+  server:
+    build: .
+    platform: linux/amd64
+    ports:
+      - "31337:31337"   # implant listener
+      - "31338:31338"   # operator listener
+    environment:
+      IMPLANT_LISTENER: "0.0.0.0:31337"
+      OPERATOR_LISTENER: "0.0.0.0:31338"
+    command: server
+
+  operator:
+    build: .
+    platform: linux/amd64
+    environment:
+      OPERATOR_SERVER_ADDRESS: "server:31338"
+      IMPLANT_OUT_DIR: "/home/avocado/implant-out"
+    volumes:
+      - ./implant-out:/home/avocado/implant-out
+    command: operator
+    stdin_open: true
+    tty: true
+    depends_on:
+      - server
+    profiles:
+      - cli

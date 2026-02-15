@@ -89,11 +89,12 @@ def generate(endpoint: str, target_os: str) -> Profile:
     except FileExistsError:
         pass
 
-    # Compile the implant.
+    # Compile the implant. Use IMPLANT_OUT_DIR so Docker can mount a host dir.
+    out_dir = os.environ.get("IMPLANT_OUT_DIR", ".")
     profile = Profile(
         server_endpoint=endpoint,
         implant_certs=(cert_path, key_path),
-        out_dir=".",
+        out_dir=out_dir,
         assets_dir=assets_dir,
         target_os=target_os
     )

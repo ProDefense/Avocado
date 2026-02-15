@@ -28,33 +28,47 @@
 
 ## Quick Start
 
-Avocado currently only supports a Docker installation.
-1. **Build and run docker container**
+Avocado currently only supports a Docker installation. You can run everything from your host; no need to attach into the container.
+
+1. **Build and start the server**
+```bash
+docker compose up -d --build server
 ```
-$ docker build . -t avocado
-$ docker run --rm --name avocado -it avocado
+The server listens for implants on port **31337** and for operators on **31338**.
+
+2. **Run the CLI operator** (in a new terminal)
+```bash
+docker compose run --rm operator
+```
+The operator connects to the server automatically. No `docker exec` or shell inside the container.
+
+3. **Generate an implant** from the operator prompt
+```
+[Avocado] > generate <host:port> <linux|windows>
+```
+Example: `generate 192.168.1.100:31337 linux`. The built implant is written to the **`implant-out/`** directory in the repo (mounted from the container).
+
+To use a different output directory on your machine, run the operator with a bind mount:
+```bash
+docker compose run --rm -v /path/on/host:/home/avocado/implant-out -e IMPLANT_OUT_DIR=/home/avocado/implant-out operator
 ```
 
-2. **Inside the container, run the server**
-```
-avocado$ cd src/server
-avocado$ ./main.py
-```
+### Alternative: plain Docker
 
-4. **On another terminal, run the the operator (only CLI operator is supported via Docker)**
+Without compose, run the server with env vars so it doesn’t prompt:
+```bash
+docker build -t avocado .
+docker run --rm -p 31337:31337 -p 31338:31338 \
+  -e IMPLANT_LISTENER=0.0.0.0:31337 -e OPERATOR_LISTENER=0.0.0.0:31338 \
+  --name avocado avocado
 ```
-$ docker exec -it avocado src/avocado-operator-cli
+In another terminal, run the operator (set the server address to your host’s Docker IP or `host.docker.internal:31338` if the operator runs on the host):
+```bash
+docker run --rm -it --add-host=host.docker.internal:host-gateway \
+  -e OPERATOR_SERVER_ADDRESS=host.docker.internal:31338 \
+  --name avocado-operator avocado operator
 ```
-
-5. **Using the operator, compile and run the implant.**
-```
-[avocado] > generate <host:port> <linux|windows>
-```
-
-The implant will be output into the current working directory. If you wish to copy it to your local machine:
-```
-$ docker cp avocado:src/implant .
-```
+To get a shell inside the container: `docker run --rm -it avocado bash`.
 
 ## GUI Operator
 ![GUI Operator](assets/gui.png)
